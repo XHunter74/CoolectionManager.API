@@ -1,4 +1,5 @@
 ﻿using CQRSMediatr;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -7,6 +8,7 @@ using OpenIddict.Validation.AspNetCore;
 using Serilog;
 using System.Reflection;
 using xhunter74.CollectionManager.API.Extensions;
+using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
 using xhunter74.CollectionManager.API.Settings;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Shared.Services;
@@ -107,6 +109,9 @@ public class Startup
             options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
         });
+
+        services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
