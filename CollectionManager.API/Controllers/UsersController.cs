@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Features.Users;
 using xhunter74.CollectionManager.API.Models;
+using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
+using xhunter74.CollectionManager.API.Permissions;
 using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
@@ -69,6 +71,7 @@ public class UsersController : ControllerBase
     [HttpGet("{id:guid}", Name = nameof(GetUserByIdAsync))]
     [ProducesResponseType(typeof(UserProfileDto), 200)]
     [ProducesResponseType(typeof(string), 400)]
+    [PermissionAuthorize(Permissions.Permissions.ViewUser)]
     public async Task<IActionResult> GetUserByIdAsync(Guid id)
     {
         return BadRequest("Not implemented");
