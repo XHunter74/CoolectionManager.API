@@ -37,11 +37,6 @@ public class AuthorizationController : Controller
             // return tokens for refresh token flow
         }
 
-        if (oidcRequest.GrantType == "custom_flow_name")
-        {
-            // return tokens for custom flow
-        }
-
         return BadRequest(new OpenIddictResponse
         {
             Error = OpenIddictConstants.Errors.UnsupportedGrantType

@@ -2,3 +2,4 @@
 CollectionManager.API/bin/
 CollectionManager.API/obj/
 CollectionManager.API/Logs/
+CollectionManager.API/appsettings.Development.json
