@@ -54,7 +54,12 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetUserAsync()
     {
-        return Ok("Not implemented");
+        var result = await _mediatr.QueryAsync(new GetUserProfileQuery
+        {
+            UserId = User.UserId()
+        });
+
+        return Ok(result);
     }
 
 
