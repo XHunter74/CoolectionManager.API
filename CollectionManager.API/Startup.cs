@@ -5,6 +5,7 @@ using System.Reflection;
 using Serilog;
 using xhunter74.CollectionManager.API.Data;
 using xhunter74.CollectionManager.API.Extensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace xhunter74.CollectionManager.API;
 
@@ -27,6 +28,34 @@ public class Startup
         services.AddCqrsMediatr(typeof(Startup));
         services.AddDbContext<CollectionsDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("CollectionsDb")));
+
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        {
+            //TODO Identity options configuration (password, lockout, etc.)
+        })
+        .AddEntityFrameworkStores<CollectionsDbContext>()
+        .AddDefaultTokenProviders();
+
+        services.AddOpenIddict()
+            .AddCore(options =>
+            {
+                options.UseEntityFrameworkCore()
+                    .UseDbContext<CollectionsDbContext>();
+            })
+            .AddServer(options =>
+            {
+                options.AllowPasswordFlow();
+                options.AllowRefreshTokenFlow();
+                options.SetTokenEndpointUris("/connect/token");
+                options.AcceptAnonymousClients();
+                options.UseAspNetCore()
+                    .EnableTokenEndpointPassthrough();
+            })
+            .AddValidation(options =>
+            {
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
