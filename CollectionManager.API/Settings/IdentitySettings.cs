@@ -16,4 +16,10 @@ public class IdentitySettings
     [Required]
     [Range(3600, 10080, ErrorMessage = "Refresh token lifetime must be between 3600 and 10800 seconds.")]
     public int RefreshTokenLifetime { get; set; }
+
+    [Required]
+    [EmailAddress(ErrorMessage = "Invalid email address format.")]
+    public string SuperAdminEmail { get; set; }
+    [Required(AllowEmptyStrings = false, ErrorMessage = "Super admin password is required.")]
+    public string SuperAdminPassword { get; set; }
 }
