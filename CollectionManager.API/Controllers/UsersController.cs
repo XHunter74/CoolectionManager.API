@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using xhunter74.CollectionManager.API.Data;
+using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.API.Models;
 
 namespace xhunter74.CollectionManager.API.Controllers;

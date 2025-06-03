@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
-using xhunter74.CollectionManager.API.Data;
+using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.API.Settings;
 
 namespace xhunter74.CollectionManager.API.Extensions;

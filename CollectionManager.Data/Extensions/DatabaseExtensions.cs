@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using xhunter74.CollectionManager.API.Data;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using xhunter74.CollectionManager.Data.Entity;
 
-namespace xhunter74.CollectionManager.API.Extensions;
+namespace xhunter74.CollectionManager.Data.Extensions;
 
 public static class DatabaseExtensions
 {

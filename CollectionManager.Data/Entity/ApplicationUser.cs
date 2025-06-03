@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace xhunter74.CollectionManager.API.Data;
+namespace xhunter74.CollectionManager.Data.Entity;
 
 public class ApplicationUser : IdentityUser<Guid>
 {

@@ -1,14 +1,13 @@
 ﻿using CQRSMediatr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Abstractions;
 using Serilog;
 using System.Reflection;
-using xhunter74.CollectionManager.API.Data;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Settings;
+using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API;
 

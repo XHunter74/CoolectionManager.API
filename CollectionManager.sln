@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollectionManager.API", "CollectionManager.API\CollectionManager.API.csproj", "{CA3167E8-92C7-4AAE-B9F6-9B1F863245FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollectionManager.Data", "CollectionManager.Data\CollectionManager.Data.csproj", "{27BA090F-631B-415F-AF56-33A26D416D84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{CA3167E8-92C7-4AAE-B9F6-9B1F863245FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA3167E8-92C7-4AAE-B9F6-9B1F863245FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA3167E8-92C7-4AAE-B9F6-9B1F863245FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27BA090F-631B-415F-AF56-33A26D416D84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27BA090F-631B-415F-AF56-33A26D416D84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27BA090F-631B-415F-AF56-33A26D416D84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27BA090F-631B-415F-AF56-33A26D416D84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

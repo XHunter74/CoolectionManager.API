@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace xhunter74.CollectionManager.API.Data;
+namespace xhunter74.CollectionManager.Data.Entity;
 
 public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {

@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using System.Security.Claims;
-using xhunter74.CollectionManager.API.Data;
+using xhunter74.CollectionManager.Data.Entity;
 using Microsoft.AspNetCore.Authentication;
 
 namespace xhunter74.CollectionManager.API.Controllers;

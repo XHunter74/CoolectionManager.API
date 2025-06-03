@@ -1,6 +1,7 @@
 using Serilog;
 using xhunter74.CollectionManager.API;
 using xhunter74.CollectionManager.API.Extensions;
+using xhunter74.CollectionManager.Data.Extensions;
 
 public class Program
 {
