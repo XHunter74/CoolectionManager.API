@@ -34,18 +34,18 @@ public class UsersController : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
+    public async Task<IActionResult> RegisterUserAsync([FromBody] RegisterUserDto model)
     {
         var result = await _mediatr.SendAsync(new CreateUserCommand
         {
             Model = model,
         });
 
-        return CreatedAtRoute(nameof(GetUserById), new { id = result.Id }, result);
+        return CreatedAtRoute(nameof(GetUserByIdAsync), new { id = result.Id }, result);
     }
 
-    [HttpGet("{id:guid}", Name = nameof(GetUserById))]
-    public async Task<IActionResult> GetUserById(Guid id)
+    [HttpGet("{id:guid}", Name = nameof(GetUserByIdAsync))]
+    public async Task<IActionResult> GetUserByIdAsync(Guid id)
     {
         return Ok("Not implemented");
     }
