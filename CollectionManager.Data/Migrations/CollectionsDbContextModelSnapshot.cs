@@ -360,7 +360,7 @@ namespace xhunter74.CollectionManager.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("xhunter74.CollectionManager.API.Data.ApplicationUser", b =>
+            modelBuilder.Entity("xhunter74.CollectionManager.Data.Entity.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -436,7 +436,7 @@ namespace xhunter74.CollectionManager.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("xhunter74.CollectionManager.API.Data.ApplicationUser", null)
+                    b.HasOne("xhunter74.CollectionManager.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -445,7 +445,7 @@ namespace xhunter74.CollectionManager.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("xhunter74.CollectionManager.API.Data.ApplicationUser", null)
+                    b.HasOne("xhunter74.CollectionManager.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -460,7 +460,7 @@ namespace xhunter74.CollectionManager.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("xhunter74.CollectionManager.API.Data.ApplicationUser", null)
+                    b.HasOne("xhunter74.CollectionManager.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -469,7 +469,7 @@ namespace xhunter74.CollectionManager.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("xhunter74.CollectionManager.API.Data.ApplicationUser", null)
+                    b.HasOne("xhunter74.CollectionManager.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
