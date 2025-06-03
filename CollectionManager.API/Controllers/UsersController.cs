@@ -2,6 +2,7 @@ using CQRSMediatr.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Validation.AspNetCore;
 using xhunter74.CollectionManager.API.Features.Authorization;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
@@ -9,6 +10,7 @@ using xhunter74.CollectionManager.Data.Entity;
 namespace xhunter74.CollectionManager.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
@@ -44,7 +46,7 @@ public class UsersController : ControllerBase
     [HttpGet("{id:guid}", Name = nameof(GetUserById))]
     public async Task<IActionResult> GetUserById(Guid id)
     {
-        throw new NotImplementedException("This method is not implemented yet.");
+        return Ok("Not implemented");
     }
 
 }
