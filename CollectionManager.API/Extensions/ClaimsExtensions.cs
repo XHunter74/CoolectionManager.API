@@ -4,12 +4,14 @@ namespace xhunter74.CollectionManager.API.Extensions;
 
 public static class ClaimsExtensions
 {
-    
+
     public static Guid UserId(this ClaimsPrincipal user)
     {
         if (user.Identity != null && user.Identity.IsAuthenticated)
         {
-            var id = user.Identity.Name;
+            var id = user.Claims
+                .Where(x => x.Type.Equals("sub", StringComparison.InvariantCultureIgnoreCase))
+                .Select(x => x.Value).FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(id))
                 return new Guid(id);
             throw new InvalidDataException("UserId has not specified");
