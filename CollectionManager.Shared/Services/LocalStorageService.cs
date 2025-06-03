@@ -31,12 +31,11 @@ public class LocalStorageService : BaseService, IStorageService
         return Task.CompletedTask;
     }
 
-    public async Task<Guid> UploadFileAsync(byte[] sources)
+    public async Task UploadFileAsync(Guid fileId, byte[] sources)
     {
         if (sources == null || sources.Length == 0)
             throw new ArgumentException("Source data is null or empty.", nameof(sources));
 
-        var fileId = Guid.NewGuid();
         var filePath = Path.Combine(_storageFolder, fileId.ToString());
 
         try
@@ -48,7 +47,5 @@ public class LocalStorageService : BaseService, IStorageService
             Logger.LogError(ex, "Failed to upload file with ID {FileId} to path {FilePath}", fileId, filePath);
             throw;
         }
-
-        return fileId;
     }
 }

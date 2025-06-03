@@ -2,8 +2,8 @@ using CQRSMediatr.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Validation.AspNetCore;
-using xhunter74.CollectionManager.API.Features.Authorization;
+using xhunter74.CollectionManager.API.Extensions;
+using xhunter74.CollectionManager.API.Features.Users;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 
@@ -14,6 +14,7 @@ namespace xhunter74.CollectionManager.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
+    private const string AvatarFormFieldName = "avatar";
     private readonly ILogger<UsersController> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly CollectionsDbContext _collectionsDbContext;
@@ -49,4 +50,39 @@ public class UsersController : ControllerBase
         return Ok("Not implemented");
     }
 
+
+    [HttpGet]
+    public async Task<IActionResult> GetUserAsync()
+    {
+        return Ok("Not implemented");
+    }
+
+
+    [HttpPost("avatar")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadAvatarAsync()
+    {
+        if (!Request.HasFormContentType || Request.Form.Files.Count == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        var file = Request.Form.Files[AvatarFormFieldName];
+        if (file == null)
+        {
+            return BadRequest("Avatar file not found in form data.");
+        }
+
+        using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
+        byte[] avatarBytes = memoryStream.ToArray();
+
+        _ = await _mediatr.SendAsync(new UploadAvatarCommand
+        {
+            UserId = User.UserId(),
+            Sources = avatarBytes
+        });
+
+        return Created();
+    }
 }

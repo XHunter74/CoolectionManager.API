@@ -8,6 +8,6 @@ namespace xhunter74.CollectionManager.Shared.Services.Interfaces;
 
 public interface IStorageService
 {
-    Task<Guid> UploadFileAsync(byte[] sources);
+    Task UploadFileAsync(Guid fileId, byte[] sources);
     Task DeleteFileAsync(Guid fileId);
 }
