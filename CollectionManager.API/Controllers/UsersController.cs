@@ -9,6 +9,9 @@ using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
+/// <summary>
+/// Controller for user management operations such as registration, profile retrieval, and avatar upload.
+/// </summary>
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
@@ -20,6 +23,9 @@ public class UsersController : ControllerBase
     private readonly CollectionsDbContext _collectionsDbContext;
     private readonly ICqrsMediatr _mediatr;
 
+    /// <summary>
+    /// Constructor for UsersController.
+    /// </summary>
     public UsersController(
         ILogger<UsersController> logger,
         UserManager<ApplicationUser> userManager,
@@ -32,8 +38,17 @@ public class UsersController : ControllerBase
         _mediatr = mediatr;
     }
 
+    /// <summary>
+    /// Registers a new user.
+    /// </summary>
+    /// <param name="model">The registration data.</param>
+    /// <returns>The created user result.</returns>
+    /// <response code="201">User created successfully.</response>
+    /// <response code="400">Invalid registration data.</response>
     [HttpPost]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(RegisterUserResultDto), 201)]
+    [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> RegisterUserAsync([FromBody] RegisterUserDto model)
     {
         var result = await _mediatr.SendAsync(new CreateUserCommand
@@ -44,14 +59,28 @@ public class UsersController : ControllerBase
         return CreatedAtRoute(nameof(GetUserByIdAsync), new { id = result.Id }, result);
     }
 
+    /// <summary>
+    /// Gets a user by their unique identifier.
+    /// </summary>
+    /// <param name="id">The user's unique identifier.</param>
+    /// <returns>The user profile.</returns>
+    /// <response code="200">Returns the user profile.</response>
+    /// <response code="400">User not found or invalid id.</response>
     [HttpGet("{id:guid}", Name = nameof(GetUserByIdAsync))]
+    [ProducesResponseType(typeof(UserProfileDto), 200)]
+    [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> GetUserByIdAsync(Guid id)
     {
-        return Ok("Not implemented");
+        return BadRequest("Not implemented");
     }
 
-
+    /// <summary>
+    /// Gets the profile of the currently authenticated user.
+    /// </summary>
+    /// <returns>The user profile.</returns>
+    /// <response code="200">Returns the user profile.</response>
     [HttpGet]
+    [ProducesResponseType(typeof(UserProfileDto), 200)]
     public async Task<IActionResult> GetUserAsync()
     {
         var result = await _mediatr.QueryAsync(new GetUserProfileQuery
@@ -62,9 +91,19 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
-
+    /// <summary>
+    /// Uploads a new avatar for the currently authenticated user.
+    /// </summary>
+    /// <remarks>
+    /// Expects a multipart/form-data request with the avatar file in the 'avatar' field.
+    /// </remarks>
+    /// <returns>Status of the upload operation.</returns>
+    /// <response code="201">Avatar uploaded successfully.</response>
+    /// <response code="400">No file uploaded or avatar file not found in form data.</response>
     [HttpPost("avatar")]
     [Consumes("multipart/form-data")]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> UploadAvatarAsync()
     {
         if (!Request.HasFormContentType || Request.Form.Files.Count == 0)

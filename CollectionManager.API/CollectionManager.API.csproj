@@ -5,6 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>xhunter74.CollectionManager.API</RootNamespace>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,8 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CollectionManager.Data\CollectionManager.Data.csproj" />
-	  <ProjectReference Include="..\CollectionManager.Shared\CollectionManager.Shared.csproj" />
+		<ProjectReference Include="..\CollectionManager.Data\CollectionManager.Data.csproj" />
+		<ProjectReference Include="..\CollectionManager.Shared\CollectionManager.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
