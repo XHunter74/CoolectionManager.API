@@ -9,6 +9,8 @@ using System.Reflection;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Settings;
 using xhunter74.CollectionManager.Data.Entity;
+using xhunter74.CollectionManager.Shared.Services;
+using xhunter74.CollectionManager.Shared.Services.Interfaces;
 
 namespace xhunter74.CollectionManager.API;
 
@@ -33,6 +35,19 @@ public class Startup
         {
             options.UseNpgsql(Configuration.GetConnectionString("CollectionsDb"));
             options.UseOpenIddict<Guid>();
+        });
+
+        services.AddOptions<StorageSettings>()
+            .Bind(Configuration.GetSection(StorageSettings.ConfigSection))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        var storageSettings = Configuration.GetSection(StorageSettings.ConfigSection).Get<StorageSettings>();
+
+        services.AddScoped<IStorageService, LocalStorageService>(x =>
+        {
+            var logger = x.GetRequiredService<ILogger<LocalStorageService>>();
+            return new LocalStorageService(logger, storageSettings.StorageFolder);
         });
 
         services.AddOptions<IdentitySettings>()
