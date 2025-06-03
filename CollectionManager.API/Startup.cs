@@ -44,12 +44,16 @@ public class Startup
             })
             .AddServer(options =>
             {
-                options.AllowPasswordFlow();
-                options.AllowRefreshTokenFlow();
+                options.AllowClientCredentialsFlow().AllowRefreshTokenFlow();
+                options.AllowPasswordFlow().AllowRefreshTokenFlow();
                 options.SetTokenEndpointUris("/connect/token");
                 options.AcceptAnonymousClients();
                 options.UseAspNetCore()
-                    .EnableTokenEndpointPassthrough();
+                    .EnableTokenEndpointPassthrough()
+                    .EnableAuthorizationEndpointPassthrough();
+                //TODO Need to change in production
+                options.AddDevelopmentEncryptionCertificate();
+                options.AddDevelopmentSigningCertificate();
             })
             .AddValidation(options =>
             {
