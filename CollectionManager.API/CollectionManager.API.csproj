@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\CollectionManager.Data\CollectionManager.Data.csproj" />
+	  <ProjectReference Include="..\CollectionManager.Shared\CollectionManager.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

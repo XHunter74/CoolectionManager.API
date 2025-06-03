@@ -1,7 +1,7 @@
-﻿using xhunter74.CollectionManager.API.Exceptions;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 using Serilog.Events;
+using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Extensions;
 

@@ -1,4 +1,6 @@
-﻿namespace xhunter74.CollectionManager.API.Exceptions;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace xhunter74.CollectionManager.Shared.Exceptions;
 
 public class BadRequestException : AppException
 {

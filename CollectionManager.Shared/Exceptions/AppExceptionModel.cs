@@ -1,4 +1,4 @@
-﻿namespace xhunter74.CollectionManager.API.Exceptions;
+﻿namespace xhunter74.CollectionManager.Shared.Exceptions;
 
 public class AppExceptionModel
 {
