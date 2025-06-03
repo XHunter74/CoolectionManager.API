@@ -4,7 +4,7 @@ using xhunter74.CollectionManager.Shared.Exceptions;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 
-namespace xhunter74.CollectionManager.API.Features.Authorization;
+namespace xhunter74.CollectionManager.API.Features.Users;
 
 public class CreateUserCommand : ICommand<RegisterUserResultDto>
 {
