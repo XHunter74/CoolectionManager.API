@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Abstractions;
+using OpenIddict.Validation.AspNetCore;
 using Serilog;
 using System.Reflection;
 using xhunter74.CollectionManager.API.Extensions;
@@ -88,8 +89,8 @@ public class Startup
 
         services.AddAuthentication(options =>
         {
-            options.DefaultScheme = OpenIddictConstants.Schemes.Bearer;
-            options.DefaultChallengeScheme = OpenIddictConstants.Schemes.Bearer;
+            options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
         });
 
         services.AddEndpointsApiExplorer();
