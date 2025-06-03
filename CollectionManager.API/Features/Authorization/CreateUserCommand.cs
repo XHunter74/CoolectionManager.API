@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using xhunter74.CollectionManager.API.Exceptions;
+using xhunter74.CollectionManager.Shared.Exceptions;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 
@@ -31,22 +31,22 @@ public class CreateUserHandler : BaseFeatureHandler, ICommandHandler<CreateUserC
 
     public async Task<IActionResult> HandleAsync(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        if (command.ModelState.IsValid)
-        {
-            var user = await _userManager.FindByNameAsync(command.Model.Email);
-            if (user != null)
-            {
-                throw new ConflictException("User already exists with this email address.");
-            }
 
-            user = new ApplicationUser { UserName = command.Model.Email, Email = command.Model.Email };
-            var result = await _userManager.CreateAsync(user, command.Model.Password);
-            if (result.Succeeded)
-            {
-                return new OkResult();
-            }
-            command.ModelState = AddErrors(command.ModelState, result);
+        ValidateModel(command.Model);
+
+        var user = await _userManager.FindByNameAsync(command.Model.Email);
+        if (user != null)
+        {
+            throw new ConflictException("User already exists with this email address.");
         }
+
+        user = new ApplicationUser { UserName = command.Model.Email, Email = command.Model.Email };
+        var result = await _userManager.CreateAsync(user, command.Model.Password);
+        if (result.Succeeded)
+        {
+            return new OkResult();
+        }
+        command.ModelState = AddErrors(command.ModelState, result);
 
         return new BadRequestObjectResult(command.ModelState);
     }
