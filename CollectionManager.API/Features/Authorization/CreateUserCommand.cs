@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using xhunter74.CollectionManager.API.Exceptions;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 
@@ -35,7 +36,7 @@ public class CreateUserHandler : BaseFeatureHandler, ICommandHandler<CreateUserC
             var user = await _userManager.FindByNameAsync(command.Model.Email);
             if (user != null)
             {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
+                throw new ConflictException("User already exists with this email address.");
             }
 
             user = new ApplicationUser { UserName = command.Model.Email, Email = command.Model.Email };
