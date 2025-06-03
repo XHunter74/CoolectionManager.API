@@ -1,11 +1,14 @@
 ﻿using CQRSMediatr;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
+using OpenIddict.Abstractions;
 using Serilog;
+using System.Reflection;
 using xhunter74.CollectionManager.API.Data;
 using xhunter74.CollectionManager.API.Extensions;
-using Microsoft.AspNetCore.Identity;
+using xhunter74.CollectionManager.API.Settings;
 
 namespace xhunter74.CollectionManager.API;
 
@@ -27,7 +30,15 @@ public class Startup
         services.AddControllers();
         services.AddCqrsMediatr(typeof(Startup));
         services.AddDbContext<CollectionsDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("CollectionsDb")));
+        {
+            options.UseNpgsql(Configuration.GetConnectionString("CollectionsDb"));
+            options.UseOpenIddict<Guid>();
+        });
+
+        services.AddOptions<IdentitySettings>()
+            .Bind(Configuration.GetSection(IdentitySettings.ConfigSection))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {
@@ -36,30 +47,51 @@ public class Startup
         .AddEntityFrameworkStores<CollectionsDbContext>()
         .AddDefaultTokenProviders();
 
+        var identitySettings = Configuration.GetSection(IdentitySettings.ConfigSection).Get<IdentitySettings>();
+
         services.AddOpenIddict()
             .AddCore(options =>
             {
                 options.UseEntityFrameworkCore()
-                    .UseDbContext<CollectionsDbContext>();
+                       .UseDbContext<CollectionsDbContext>()
+                       .ReplaceDefaultEntities<Guid>();
+
             })
-            .AddServer(options =>
-            {
-                options.AllowClientCredentialsFlow().AllowRefreshTokenFlow();
-                options.AllowPasswordFlow().AllowRefreshTokenFlow();
-                options.SetTokenEndpointUris("/connect/token");
-                options.AcceptAnonymousClients();
-                options.UseAspNetCore()
-                    .EnableTokenEndpointPassthrough()
-                    .EnableAuthorizationEndpointPassthrough();
-                //TODO Need to change in production
-                options.AddDevelopmentEncryptionCertificate();
-                options.AddDevelopmentSigningCertificate();
-            })
-            .AddValidation(options =>
-            {
-                options.UseLocalServer();
-                options.UseAspNetCore();
-            });
+                .AddServer(options =>
+                {
+                    // Enable the required endpoints
+                    options.SetTokenEndpointUris("/connect/token");
+
+                    options.AllowPasswordFlow();
+                    options.AllowRefreshTokenFlow();
+
+                    options.UseReferenceAccessTokens();
+                    options.UseReferenceRefreshTokens();
+
+                    options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email,
+                                    OpenIddictConstants.Permissions.Scopes.Profile,
+                                    OpenIddictConstants.Permissions.Scopes.Roles);
+
+                    options.SetAccessTokenLifetime(TimeSpan.FromSeconds(identitySettings.AccessTokenLifetime));
+                    options.SetRefreshTokenLifetime(TimeSpan.FromSeconds(identitySettings.RefreshTokenLifetime));
+
+                    //TODO - Change in production
+                    options.AddDevelopmentEncryptionCertificate()
+                        .AddDevelopmentSigningCertificate();
+
+                    options.UseAspNetCore().EnableTokenEndpointPassthrough();
+                })
+                .AddValidation(options =>
+                {
+                    options.UseLocalServer();
+                    options.UseAspNetCore();
+                });
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = OpenIddictConstants.Schemes.Bearer;
+            options.DefaultChallengeScheme = OpenIddictConstants.Schemes.Bearer;
+        });
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>

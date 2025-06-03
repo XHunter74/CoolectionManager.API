@@ -21,6 +21,8 @@ public class Program
 
         app.ApplyDbMigrations();
 
+        app.SeedIdentityEntities();
+
         app.Run();
     }
 }

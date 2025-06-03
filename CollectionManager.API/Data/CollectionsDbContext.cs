@@ -12,5 +12,6 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.UseOpenIddict<Guid>();
     }
 }
