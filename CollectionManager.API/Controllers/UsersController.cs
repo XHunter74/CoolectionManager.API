@@ -36,10 +36,15 @@ public class UsersController : ControllerBase
         var result = await _mediatr.SendAsync(new CreateUserCommand
         {
             Model = model,
-            ModelState = ModelState
         });
 
-        return result;
+        return CreatedAtRoute(nameof(GetUserById), new { id = result.Id }, result);
+    }
+
+    [HttpGet("{id:guid}", Name = nameof(GetUserById))]
+    public async Task<IActionResult> GetUserById(Guid id)
+    {
+        throw new NotImplementedException("This method is not implemented yet.");
     }
 
 }

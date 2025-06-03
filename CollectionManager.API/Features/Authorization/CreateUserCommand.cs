@@ -1,20 +1,17 @@
 ﻿using CQRSMediatr.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using xhunter74.CollectionManager.Shared.Exceptions;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Features.Authorization;
 
-public class CreateUserCommand : ICommand<IActionResult>
+public class CreateUserCommand : ICommand<RegisterUserResultDto>
 {
     public RegisterUserDto Model { get; set; }
-    public ModelStateDictionary ModelState { get; set; }
 }
 
-public class CreateUserHandler : BaseFeatureHandler, ICommandHandler<CreateUserCommand, IActionResult>
+public class CreateUserHandler : BaseFeatureHandler, ICommandHandler<CreateUserCommand, RegisterUserResultDto>
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly CollectionsDbContext _dbContext;
@@ -29,7 +26,7 @@ public class CreateUserHandler : BaseFeatureHandler, ICommandHandler<CreateUserC
         _dbContext = dbContext;
     }
 
-    public async Task<IActionResult> HandleAsync(CreateUserCommand command, CancellationToken cancellationToken)
+    public async Task<RegisterUserResultDto> HandleAsync(CreateUserCommand command, CancellationToken cancellationToken)
     {
 
         ValidateModel(command.Model);
@@ -44,19 +41,12 @@ public class CreateUserHandler : BaseFeatureHandler, ICommandHandler<CreateUserC
         var result = await _userManager.CreateAsync(user, command.Model.Password);
         if (result.Succeeded)
         {
-            return new OkResult();
+            return new RegisterUserResultDto { Id = user.Id, Name = user.UserName };
         }
-        command.ModelState = AddErrors(command.ModelState, result);
 
-        return new BadRequestObjectResult(command.ModelState);
+        var errormessage = string.Join(", ", result.Errors.Select(e => e.Description));
+
+        throw new BadRequestException($"User creation failed: {errormessage}");
     }
 
-    private static ModelStateDictionary AddErrors(ModelStateDictionary modelState, IdentityResult result)
-    {
-        foreach (var error in result.Errors)
-        {
-            modelState.AddModelError(string.Empty, error.Description);
-        }
-        return modelState;
-    }
 }
