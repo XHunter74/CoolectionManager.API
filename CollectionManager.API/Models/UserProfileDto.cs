@@ -6,4 +6,6 @@ public record UserProfileDto
     public string Name { get; init; }
     public string Email { get; init; }
     public Guid? Avatar { get; init; }
+    public DateTime Created { get; init; }
+    public DateTime Updated { get; init; }
 }

@@ -39,6 +39,8 @@ public class GetUserProfileQueryHandler : BaseFeatureHandler, IQueryHandler<GetU
             Name = user.UserName,
             Email = user.Email,
             Avatar = user.Avatar.HasValue ? user.Avatar.Value : null,
+            Created = user.Created,
+            Updated = user.Updated
         };
 
         return profile;
