@@ -14,4 +14,35 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
         base.OnModelCreating(builder);
         builder.UseOpenIddict<Guid>();
     }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var insertedEntries = ChangeTracker.Entries()
+                               .Where(x => x.State == EntityState.Added)
+                               .Select(x => x.Entity);
+
+        foreach (var insertedEntry in insertedEntries)
+        {
+            if (insertedEntry is IBaseEntity baseEntity)
+            {
+                baseEntity.Created = DateTime.UtcNow;
+                baseEntity.Updated = DateTime.UtcNow;
+            }
+        }
+
+        var modifiedEntries = ChangeTracker.Entries()
+                   .Where(x => x.State == EntityState.Modified)
+                   .Select(x => x.Entity);
+
+        foreach (var modifiedEntry in modifiedEntries)
+        {
+            //If the inserted object is an Auditable. 
+            if (modifiedEntry is IBaseEntity baseEntity)
+            {
+                baseEntity.Updated = DateTime.UtcNow;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
 }
