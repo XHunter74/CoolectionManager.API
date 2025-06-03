@@ -24,10 +24,11 @@ public static class IdentityExtensions
                 ClientSecret = identitySettings.DefaultClientSecret,
                 DisplayName = "Default client application",
                 Permissions =
-        {
-            OpenIddictConstants.Permissions.Endpoints.Token,
-            OpenIddictConstants.Permissions.GrantTypes.Password
-        }
+                    {
+                        OpenIddictConstants.Permissions.Endpoints.Token,
+                        OpenIddictConstants.Permissions.GrantTypes.Password,
+                        OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                    }
             }).GetAwaiter().GetResult();
         }
     }
