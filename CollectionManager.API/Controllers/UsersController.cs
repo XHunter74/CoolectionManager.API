@@ -1,8 +1,10 @@
+using CQRSMediatr.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using xhunter74.CollectionManager.Data.Entity;
+using xhunter74.CollectionManager.API.Features.Authorization;
 using xhunter74.CollectionManager.API.Models;
+using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
@@ -13,47 +15,31 @@ public class UsersController : ControllerBase
     private readonly ILogger<UsersController> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly CollectionsDbContext _collectionsDbContext;
+    private readonly ICqrsMediatr _mediatr;
 
     public UsersController(
         ILogger<UsersController> logger,
         UserManager<ApplicationUser> userManager,
-        CollectionsDbContext collectionsDbContext)
+        CollectionsDbContext collectionsDbContext,
+        ICqrsMediatr mediatr)
     {
         _logger = logger;
         _userManager = userManager;
         _collectionsDbContext = collectionsDbContext;
+        _mediatr = mediatr;
     }
 
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
     {
-        if (ModelState.IsValid)
+        var result = await _mediatr.SendAsync(new CreateUserCommand
         {
-            var user = await _userManager.FindByNameAsync(model.Email);
-            if (user != null)
-            {
-                return StatusCode(StatusCodes.Status409Conflict);
-            }
+            Model = model,
+            ModelState = ModelState
+        });
 
-            user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                return Ok();
-            }
-            AddErrors(result);
-        }
-
-        return BadRequest(ModelState);
-    }
-
-    private void AddErrors(IdentityResult result)
-    {
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
+        return result;
     }
 
 }
