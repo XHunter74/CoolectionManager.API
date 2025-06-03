@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using System.Security.Claims;
+using xhunter74.CollectionManager.API.Permissions;
 using xhunter74.CollectionManager.Data.Entity;
-using Microsoft.AspNetCore.Authentication;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
@@ -51,38 +53,48 @@ public class AuthorizationController : Controller
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (signInResult.Succeeded)
         {
-            var identity = new ClaimsIdentity(
-                TokenValidationParameters.DefaultAuthenticationType,
-                OpenIddictConstants.Claims.Name,
-                OpenIddictConstants.Claims.Role);
-
-            identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Id.ToString(), OpenIddictConstants.Destinations.AccessToken);
-            identity.AddClaim(OpenIddictConstants.Claims.Username, user.UserName, OpenIddictConstants.Destinations.AccessToken);
-
-            //foreach (var userRole in user.UserRoles)
-            //{
-            //    identity.AddClaim(OpenIddictConstants.Claims.Role, userRole.Role.NormalizedName, OpenIddictConstants.Destinations.AccessToken);
-            //}
-
-            var claimsPrincipal = new ClaimsPrincipal(identity);
-            claimsPrincipal.SetScopes(new string[]
-            {
-                OpenIddictConstants.Scopes.Roles,
-                OpenIddictConstants.Scopes.OfflineAccess,
-                OpenIddictConstants.Scopes.Email,
-                OpenIddictConstants.Scopes.Profile,
-            });
-
-            return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            var result = await CreateTokenForUserAsync(user);
+            return result;
         }
         else
             return Unauthorized();
     }
 
+
+    private async Task<Microsoft.AspNetCore.Mvc.SignInResult> CreateTokenForUserAsync(ApplicationUser user)
+    {
+        var identity = new ClaimsIdentity(
+                TokenValidationParameters.DefaultAuthenticationType,
+                OpenIddictConstants.Claims.Name,
+                OpenIddictConstants.Claims.Role);
+
+        identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Id.ToString(), OpenIddictConstants.Destinations.AccessToken);
+        identity.AddClaim(OpenIddictConstants.Claims.Username, user.UserName, OpenIddictConstants.Destinations.AccessToken);
+
+        var userClaims = await _userManager.GetClaimsAsync(user);
+
+        foreach (var claim in userClaims.Where(e => e.Type == AppClaimTypes.UserPermissionClaim))
+        {
+            claim.SetDestinations(OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken);
+            identity.AddClaim(claim);
+        }
+
+        var claimsPrincipal = new ClaimsPrincipal(identity);
+        claimsPrincipal.SetScopes(new string[]
+        {
+                OpenIddictConstants.Scopes.Roles,
+                OpenIddictConstants.Scopes.OfflineAccess,
+                OpenIddictConstants.Scopes.Email,
+                OpenIddictConstants.Scopes.Profile,
+        });
+
+        return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
     private async Task<IActionResult> TokensForRefreshTokenGrantType()
     {
-        var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        if (result?.Principal == null)
+        var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        if (authResult?.Principal == null)
         {
             return BadRequest(new OpenIddictResponse
             {
@@ -91,7 +103,7 @@ public class AuthorizationController : Controller
             });
         }
 
-        var userId = result.Principal.GetClaim(OpenIddictConstants.Claims.Subject);
+        var userId = authResult.Principal.GetClaim(OpenIddictConstants.Claims.Subject);
         if (string.IsNullOrEmpty(userId))
         {
             return BadRequest(new OpenIddictResponse
@@ -120,18 +132,8 @@ public class AuthorizationController : Controller
             });
         }
 
-        var identity = new ClaimsIdentity(
-            TokenValidationParameters.DefaultAuthenticationType,
-            OpenIddictConstants.Claims.Name,
-            OpenIddictConstants.Claims.Role);
+        var result = await CreateTokenForUserAsync(user);
 
-        identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Id.ToString(), OpenIddictConstants.Destinations.AccessToken);
-        identity.AddClaim(OpenIddictConstants.Claims.Username, user.UserName, OpenIddictConstants.Destinations.AccessToken);
-
-        var scopes = result.Principal.GetScopes();
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-        claimsPrincipal.SetScopes(scopes);
-
-        return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        return result;
     }
 }
