@@ -17,14 +17,14 @@ public class LocalImageServiceTests
         _service = new LocalImageService(_loggerMock.Object);
     }
 
-    [Fact]
+    [Fact(DisplayName = "ConvertToPngAsync throws BadRequestException on null or empty input")]
     public async Task ConvertToPngAsync_ThrowsOnNullOrEmpty()
     {
         await Assert.ThrowsAsync<BadRequestException>(() => _service.ConvertToPngAsync(null));
         await Assert.ThrowsAsync<BadRequestException>(() => _service.ConvertToPngAsync(Array.Empty<byte>()));
     }
 
-    [Fact]
+    [Fact(DisplayName = "ConvertToPngAsync converts JPEG to PNG and preserves pixel data")]
     public async Task ConvertToPngAsync_ConvertsJpegToPng()
     {
         using var image = new Image<Rgba32>(1, 1);
