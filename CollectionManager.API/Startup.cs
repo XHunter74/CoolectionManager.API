@@ -1,18 +1,9 @@
-﻿using CQRSMediatr;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using OpenIddict.Abstractions;
-using OpenIddict.Validation.AspNetCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Reflection;
 using xhunter74.CollectionManager.API.Extensions;
-using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
-using xhunter74.CollectionManager.API.Settings;
 using xhunter74.CollectionManager.Data.Entity;
-using xhunter74.CollectionManager.Shared.Services;
-using xhunter74.CollectionManager.Shared.Services.Interfaces;
+using xhunter74.CollectionManager.Data.Extensions;
 
 namespace xhunter74.CollectionManager.API;
 
@@ -33,131 +24,17 @@ public class Startup
         });
         services.AddControllers();
 
-        services.AddCqrsMediatr(typeof(Startup));
-
         services.AddDbContext<CollectionsDbContext>(options =>
         {
             options.UseNpgsql(Configuration.GetConnectionString("CollectionsDb"));
             options.UseOpenIddict<Guid>();
         });
 
-        services.AddScoped<IImageService, LocalImageService>();
+        services.AddAppServices(Configuration);
 
-        services.AddOptions<AppSettings>()
-            .Bind(Configuration.GetSection(AppSettings.ConfigSection))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+        services.AddIdentityServices(Configuration);
 
-        services.AddOptions<StorageSettings>()
-            .Bind(Configuration.GetSection(StorageSettings.ConfigSection))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        var appSettings = Configuration.GetSection(AppSettings.ConfigSection).Get<AppSettings>();
-        var storageSettings = Configuration.GetSection(StorageSettings.ConfigSection).Get<StorageSettings>();
-
-        switch (appSettings.StorageService)
-        {
-            case StorageServices.LocalStorageService:
-                services.AddScoped<IStorageService, LocalStorageService>(x =>
-                {
-                    var logger = x.GetRequiredService<ILogger<LocalStorageService>>();
-                    return new LocalStorageService(logger, storageSettings.StorageFolder);
-                });
-                break;
-            default:
-                throw new NotSupportedException($"Unsupported storage type: {appSettings.StorageService}");
-        }
-
-        services.AddScoped<IStorageService, LocalStorageService>(x =>
-        {
-            var logger = x.GetRequiredService<ILogger<LocalStorageService>>();
-            return new LocalStorageService(logger, storageSettings.StorageFolder);
-        });
-
-        services.AddOptions<IdentitySettings>()
-            .Bind(Configuration.GetSection(IdentitySettings.ConfigSection))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
-        {
-            //TODO Identity options configuration (password, lockout, etc.)
-        })
-        .AddEntityFrameworkStores<CollectionsDbContext>()
-        .AddDefaultTokenProviders();
-
-        var identitySettings = Configuration.GetSection(IdentitySettings.ConfigSection).Get<IdentitySettings>();
-
-        services.AddOpenIddict()
-            .AddCore(options =>
-            {
-                options.UseEntityFrameworkCore()
-                       .UseDbContext<CollectionsDbContext>()
-                       .ReplaceDefaultEntities<Guid>();
-
-            })
-                .AddServer(options =>
-                {
-                    // Enable the required endpoints
-                    options.SetTokenEndpointUris("/connect/token");
-
-                    options.AllowPasswordFlow();
-                    options.AllowRefreshTokenFlow();
-
-                    options.UseReferenceAccessTokens();
-                    options.UseReferenceRefreshTokens();
-
-                    options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email,
-                                    OpenIddictConstants.Permissions.Scopes.Profile,
-                                    OpenIddictConstants.Permissions.Scopes.Roles);
-
-                    options.SetAccessTokenLifetime(TimeSpan.FromSeconds(identitySettings.AccessTokenLifetime));
-                    options.SetRefreshTokenLifetime(TimeSpan.FromSeconds(identitySettings.RefreshTokenLifetime));
-
-                    //TODO - Change in production
-                    options.AddDevelopmentEncryptionCertificate()
-                        .AddDevelopmentSigningCertificate();
-
-                    options.UseAspNetCore().EnableTokenEndpointPassthrough();
-                })
-                .AddValidation(options =>
-                {
-                    options.UseLocalServer();
-                    options.UseAspNetCore();
-                });
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-        });
-
-        services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
-        services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
-
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
-        {
-            var assembly = Assembly.GetEntryAssembly();
-            if (assembly != null)
-            {
-                var version = assembly
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion;
-                var assemblyName = assembly.GetName().Name;
-
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = assemblyName,
-                    Version = version ?? "v1"
-                });
-
-                var xmlFile = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
-                if (File.Exists(xmlFile))
-                    c.IncludeXmlComments(xmlFile, true);
-            }
-        });
+        services.AddSwaggerServices();
     }
 
     public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
