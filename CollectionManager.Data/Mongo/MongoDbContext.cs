@@ -1,5 +1,5 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using xhunter74.CollectionManager.Data.Mongo.Repositories;
 
 namespace xhunter74.CollectionManager.Data.Mongo;
 
@@ -9,7 +9,7 @@ public class MongoDbContext : IMongoDbContext
     private readonly IClientSessionHandle? _session;
     private bool _disposed;
 
-    public IRepository<BsonDocument> CollectionItems { get; }
+    public CollectionsRepository CollectionItems { get; }
 
     public MongoDbContext(IMongoClient client, string databaseName)
     {
@@ -28,7 +28,7 @@ public class MongoDbContext : IMongoDbContext
         }
 
 
-        CollectionItems = new MongoRepository<BsonDocument>(database, _session, CollectionItemsCollectionName);
+        CollectionItems = new CollectionsRepository(database, _session, CollectionItemsCollectionName);
     }
 
     public async Task CommitAsync()
