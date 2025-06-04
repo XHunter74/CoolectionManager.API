@@ -43,12 +43,31 @@ public class Startup
 
         services.AddScoped<IImageService, LocalImageService>();
 
+        services.AddOptions<AppSettings>()
+            .Bind(Configuration.GetSection(AppSettings.ConfigSection))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddOptions<StorageSettings>()
             .Bind(Configuration.GetSection(StorageSettings.ConfigSection))
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        var appSettings = Configuration.GetSection(AppSettings.ConfigSection).Get<AppSettings>();
         var storageSettings = Configuration.GetSection(StorageSettings.ConfigSection).Get<StorageSettings>();
+
+        switch (appSettings.StorageService)
+        {
+            case StorageServices.LocalStorageService:
+                services.AddScoped<IStorageService, LocalStorageService>(x =>
+                {
+                    var logger = x.GetRequiredService<ILogger<LocalStorageService>>();
+                    return new LocalStorageService(logger, storageSettings.StorageFolder);
+                });
+                break;
+            default:
+                throw new NotSupportedException($"Unsupported storage type: {appSettings.StorageService}");
+        }
 
         services.AddScoped<IStorageService, LocalStorageService>(x =>
         {
