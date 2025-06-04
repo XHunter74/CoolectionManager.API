@@ -8,4 +8,5 @@ public class Collection : BaseEntity
     public Guid OwnerId { get; set; }
 
     public ApplicationUser Owner { get; set; }
+    public ICollection<CollectionField> Fields { get; set; } = new List<CollectionField>();
 }
