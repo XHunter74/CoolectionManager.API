@@ -33,7 +33,7 @@ public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<Up
         {
             var user = await _userManager.FindByIdAsync(command.UserId.ToString());
             var fileId = user!.Avatar.HasValue ? user.Avatar.Value : Guid.NewGuid();
-            await _storageService.UploadFileAsync(fileId, command.Sources);
+            await _storageService.UploadFileAsync(user.Id, fileId, command.Sources);
             user.Avatar = fileId;
             var result = await _userManager.UpdateAsync(user);
             return true;

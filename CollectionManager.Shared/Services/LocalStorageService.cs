@@ -17,9 +17,9 @@ public class LocalStorageService : BaseService, IStorageService
         }
     }
 
-    public Task DeleteFileAsync(Guid fileId)
+    public Task DeleteFileAsync(Guid userId, Guid fileId)
     {
-        var filePath = Path.Combine(_storageFolder, fileId.ToString());
+        var filePath = Path.Combine(_storageFolder, userId.ToString(), fileId.ToString());
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -31,12 +31,14 @@ public class LocalStorageService : BaseService, IStorageService
         return Task.CompletedTask;
     }
 
-    public async Task UploadFileAsync(Guid fileId, byte[] sources)
+    public async Task UploadFileAsync(Guid userId, Guid fileId, byte[] sources)
     {
         if (sources == null || sources.Length == 0)
             throw new ArgumentException("Source data is null or empty.", nameof(sources));
 
-        var filePath = Path.Combine(_storageFolder, fileId.ToString());
+        CreateFolderIfnotExists(userId.ToString());
+
+        var filePath = Path.Combine(_storageFolder, userId.ToString(), fileId.ToString());
 
         try
         {
@@ -45,6 +47,24 @@ public class LocalStorageService : BaseService, IStorageService
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to upload file with ID {FileId} to path {FilePath}", fileId, filePath);
+            throw;
+        }
+    }
+
+    private void CreateFolderIfnotExists(string folderName)
+    {
+        var folderPath = Path.Combine(_storageFolder, folderName);
+
+        if (Directory.Exists(folderPath))
+            return;
+
+        try
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to create folder with path {FolderPath}", folderPath);
             throw;
         }
     }
