@@ -12,7 +12,9 @@ using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
-//TODO Need to refactor this controller to use CQRS pattern
+/// <summary>
+/// Controller for managing items in a collection. Items are stored in MongoDB and belong to a specific collection.
+/// </summary>
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
@@ -23,6 +25,9 @@ public class ItemsController : ControllerBase
     private readonly CollectionsDbContext _dbContext;
     private readonly IMongoDbContext _mongoDbContext;
 
+    /// <summary>
+    /// Constructor for ItemsController.
+    /// </summary>
     public ItemsController(
         ILogger<CollectionsController> logger,
         ICqrsMediatr mediatr,
@@ -36,7 +41,17 @@ public class ItemsController : ControllerBase
         _mongoDbContext = mongoDbContext;
     }
 
+    /// <summary>
+    /// Gets all items for a specific collection owned by the current user.
+    /// </summary>
+    /// <param name="id">The collection's unique identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>List of items in the collection.</returns>
+    /// <response code="200">Returns the list of items.</response>
+    /// <response code="404">Collection not found or not owned by user.</response>
     [HttpGet("/api/Collections/{id:guid}/[controller]")]
+    [ProducesResponseType(typeof(IEnumerable<DynamicItemRecord>), 200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetItemsAsync(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -59,7 +74,17 @@ public class ItemsController : ControllerBase
         return Ok(items);
     }
 
+    /// <summary>
+    /// Gets a specific item by its unique identifier, if it belongs to a collection owned by the current user.
+    /// </summary>
+    /// <param name="id">The item's unique identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The item record.</returns>
+    /// <response code="200">Returns the item.</response>
+    /// <response code="404">Item or collection not found or not owned by user.</response>
     [HttpGet("{id:guid}", Name = nameof(GetItemByIdAsync))]
+    [ProducesResponseType(typeof(DynamicItemRecord), 200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetItemByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -88,7 +113,20 @@ public class ItemsController : ControllerBase
         return Ok(item);
     }
 
+    /// <summary>
+    /// Creates a new item in a specific collection owned by the current user.
+    /// </summary>
+    /// <param name="collectionId">The collection's unique identifier.</param>
+    /// <param name="model">The item creation data (array of field name/value pairs).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The created item.</returns>
+    /// <response code="201">Item created successfully.</response>
+    /// <response code="400">Field not found in collection.</response>
+    /// <response code="404">Collection not found or not owned by user.</response>
     [HttpPost("/api/Collections/{collectionId:guid}/[controller]")]
+    [ProducesResponseType(typeof(DynamicItemRecord), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> CreateItemAsync(Guid collectionId, [FromBody] CreateItemDto[] model, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
