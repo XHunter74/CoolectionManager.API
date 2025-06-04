@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Collections;
 
 namespace xhunter74.CollectionManager.Data.Mongo;
 
@@ -18,7 +19,15 @@ public class MongoDbContext : IMongoDbContext
             _session = client.StartSession();
             _session.StartTransaction();
         }
+
         var database = client.GetDatabase(databaseName);
+
+        var existingCollections = database.ListCollectionNames().ToList();
+        if (!existingCollections.Contains(CollectionItemsCollectionName))
+        {
+            database.CreateCollection(CollectionItemsCollectionName);
+        }
+
 
         CollectionItems = new MongoRepository<BsonDocument>(database, _session, CollectionItemsCollectionName);
     }
