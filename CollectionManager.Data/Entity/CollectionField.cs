@@ -1,6 +1,6 @@
 ﻿namespace xhunter74.CollectionManager.Data.Entity;
 
-public class CollectionField
+public class CollectionField : BaseEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; }
