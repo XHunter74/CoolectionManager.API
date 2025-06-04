@@ -18,7 +18,6 @@ namespace xhunter74.CollectionManager.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private const string AvatarFormFieldName = "avatar";
     private readonly ILogger<UsersController> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly CollectionsDbContext _collectionsDbContext;
@@ -113,7 +112,7 @@ public class UsersController : ControllerBase
             return BadRequest("No file uploaded.");
         }
 
-        var file = Request.Form.Files[AvatarFormFieldName];
+        var file = Request.Form.Files[Constants.AvatarFormFieldName];
         if (file == null)
         {
             return BadRequest("Avatar file not found in form data.");
@@ -136,11 +135,11 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUserAvatarAsync()
     {
         var userId = User.UserId();
-        var query= new GetUserAvatarQuery
+        var query = new GetUserAvatarQuery
         {
             UserId = userId
         };
         var avatar = await _mediatr.QueryAsync(query);
-        return File(avatar, "image/jpeg", "avatar.jpeg");
+        return File(avatar, Constants.AvatarContentType, Constants.AvatarFileName);
     }
 }

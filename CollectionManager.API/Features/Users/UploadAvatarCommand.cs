@@ -16,15 +16,18 @@ public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<Up
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStorageService _storageService;
+    private readonly IImageService _imageService;
 
     public UploadAvatarCommandHandler(
         ILogger<UploadAvatarCommandHandler> logger,
         UserManager<ApplicationUser> userManager,
-        IStorageService storageService
+        IStorageService storageService,
+        IImageService imageService
         ) : base(logger)
     {
         _userManager = userManager;
         _storageService = storageService;
+        _imageService = imageService;
     }
 
     public async Task<bool> HandleAsync(UploadAvatarCommand command, CancellationToken cancellationToken)
@@ -33,7 +36,11 @@ public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<Up
         {
             var user = await _userManager.FindByIdAsync(command.UserId.ToString());
             var fileId = user!.Avatar.HasValue ? user.Avatar.Value : Guid.NewGuid();
-            await _storageService.UploadFileAsync(user.Id, fileId, command.Sources);
+
+            var pngSources = await _imageService.ConvertToPngAsync(command.Sources);
+
+            await _storageService.UploadFileAsync(user.Id, fileId, pngSources);
+
             user.Avatar = fileId;
             var result = await _userManager.UpdateAsync(user);
             return true;

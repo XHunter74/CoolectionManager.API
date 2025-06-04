@@ -32,12 +32,16 @@ public class Startup
             e.AddSerilog();
         });
         services.AddControllers();
+
         services.AddCqrsMediatr(typeof(Startup));
+
         services.AddDbContext<CollectionsDbContext>(options =>
         {
             options.UseNpgsql(Configuration.GetConnectionString("CollectionsDb"));
             options.UseOpenIddict<Guid>();
         });
+
+        services.AddScoped<IImageService, LocalImageService>();
 
         services.AddOptions<StorageSettings>()
             .Bind(Configuration.GetSection(StorageSettings.ConfigSection))
