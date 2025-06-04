@@ -25,7 +25,7 @@ public class CollectionsController : ControllerBase
     {
         _logger = logger;
         _mediatr = mediatr;
-        this._dbContext = dbContext;
+        _dbContext = dbContext;
     }
 
     [HttpGet]
