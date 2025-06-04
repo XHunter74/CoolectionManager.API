@@ -6,7 +6,6 @@ using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Features.Users;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
-using xhunter74.CollectionManager.API.Permissions;
 using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
