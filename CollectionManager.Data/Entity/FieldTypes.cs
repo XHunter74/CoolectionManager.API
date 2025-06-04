@@ -8,7 +8,7 @@ namespace xhunter74.CollectionManager.Data.Entity;
 
 public enum FieldTypes
 {
-    Text = 0,
+    String = 0,
     Number = 1,
     DateTime = 2,
     Boolean = 3,
@@ -17,7 +17,7 @@ public enum FieldTypes
     File = 6,
     Image = 7,
     Link = 8,
-    RichText = 9,
+    Text = 9,
     ColorPicker = 10,
     Rating = 11,
     Tags = 12,
