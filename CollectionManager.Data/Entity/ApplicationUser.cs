@@ -7,4 +7,6 @@ public class ApplicationUser : IdentityUser<Guid>, IBaseEntity
     public Guid? Avatar { get; set; }
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
+
+    public ICollection<Collection> Collections { get; set; } = new List<Collection>();
 }

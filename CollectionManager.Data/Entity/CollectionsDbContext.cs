@@ -6,6 +6,8 @@ namespace xhunter74.CollectionManager.Data.Entity;
 
 public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
+    public virtual DbSet<Collection> Collections { get; set; }
+
     public CollectionsDbContext(DbContextOptions<CollectionsDbContext> options)
         : base(options) { }
 
@@ -13,6 +15,18 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
         builder.UseOpenIddict<Guid>();
+
+        builder.Entity<Collection>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.HasOne(e => e.Owner)
+                .WithMany(u => u.Collections)
+                .HasForeignKey(e => e.OwnerId)
+                .HasPrincipalKey(e => e.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
