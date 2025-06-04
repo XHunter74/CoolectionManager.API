@@ -31,6 +31,26 @@ public class LocalStorageService : BaseService, IStorageService
         return Task.CompletedTask;
     }
 
+    public async Task<byte[]?> GetFileAsync(Guid userId, Guid fileId)
+    {
+        var filePath = Path.Combine(_storageFolder, userId.ToString(), fileId.ToString());
+        if (!File.Exists(filePath))
+        {
+            Logger.LogWarning("File with ID {FileId} does not exist at path {FilePath}", fileId, filePath);
+            return null;
+        }
+
+        try
+        {
+            return await File.ReadAllBytesAsync(filePath);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to read file with ID {FileId} from path {FilePath}", fileId, filePath);
+            throw;
+        }
+    }
+
     public async Task UploadFileAsync(Guid userId, Guid fileId, byte[] sources)
     {
         if (sources == null || sources.Length == 0)
