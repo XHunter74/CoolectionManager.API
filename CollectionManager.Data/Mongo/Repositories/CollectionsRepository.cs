@@ -15,9 +15,9 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         _session = session;
     }
 
-    public async Task<DynamicItemRecord?> GetByIdAsync(string id, CancellationToken cancellationToken)
+    public async Task<DynamicItemRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        var filter = Builders<DynamicRecord>.Filter.Eq("_id", ObjectId.Parse(id));
+        var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
         var intDocument = _session == null ? await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken)
             : await _collection.Find(_session, filter).FirstOrDefaultAsync(cancellationToken);
         var document = intDocument == null ? null : new DynamicItemRecord(intDocument);
@@ -40,9 +40,9 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return entity;
     }
 
-    public async Task<bool> RemoveAsync(string id, CancellationToken cancellationToken)
+    public async Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken)
     {
-        var filter = Builders<DynamicRecord>.Filter.Eq("_id", ObjectId.Parse(id));
+        var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
         DeleteResult result;
 
         if (_session == null)
@@ -53,9 +53,9 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return result.DeletedCount > 0;
     }
 
-    public async Task<IEnumerable<DynamicItemRecord>> GetAllCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<DynamicItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
     {
-        var filter = Builders<DynamicRecord>.Filter.Eq(ItemConstants.CollectionIdFieldName, collectionId);
+        var filter = Builders<DynamicRecord>.Filter.Eq(ItemConstants.CollectionIdFieldName, collectionId.ToString());
         var allIntDocuments = _session == null ? await _collection.Find(filter).ToListAsync(cancellationToken)
             : await _collection.Find(_session, filter).ToListAsync(cancellationToken);
 
@@ -65,9 +65,9 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return allDocuments;
     }
 
-    public async Task<bool> UpdateAsync(string id, DynamicItemRecord entity, CancellationToken cancellationToken)
+    public async Task<bool> UpdateAsync(Guid id, DynamicItemRecord entity, CancellationToken cancellationToken)
     {
-        var filter = Builders<DynamicRecord>.Filter.Eq("_id", ObjectId.Parse(id));
+        var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
 
         ReplaceOneResult result;
 
