@@ -1,5 +1,8 @@
 ﻿using CQRSMediatr;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Options;
+using System.IO.Compression;
 using xhunter74.CollectionManager.API;
 using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
 using xhunter74.CollectionManager.API.Settings;
@@ -12,6 +15,24 @@ public static class AppServicesExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddResponseCompression(options =>
+        {
+            options.Providers.Add<GzipCompressionProvider>();
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.EnableForHttps = true;
+            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(Constants.CompressesContentTypes);
+        });
+
+        services.Configure<BrotliCompressionProviderOptions>(opts =>
+        {
+            opts.Level = CompressionLevel.Fastest;
+        });
+
+        services.Configure<GzipCompressionProviderOptions>(opts =>
+        {
+            opts.Level = CompressionLevel.Fastest;
+        });
+
         services.AddCqrsMediatr(typeof(Startup));
 
         services.AddScoped<IImageService, LocalImageService>();

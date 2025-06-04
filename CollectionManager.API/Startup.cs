@@ -39,6 +39,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
     {
+        builder.UseResponseCompression();
+
         if (env.IsDevelopment())
         {
             builder.UseDeveloperExceptionPage();
