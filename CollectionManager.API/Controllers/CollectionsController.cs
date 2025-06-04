@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using xhunter74.CollectionManager.Data.Entity;
-using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.API.Extensions;
+using xhunter74.CollectionManager.API.Models;
+using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
@@ -29,27 +29,29 @@ public class CollectionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CollectionDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<CollectionDto>>> GetAll(CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var collections = await _dbContext.Collections
             .Where(c => c.OwnerId == userId)
+            .AsNoTracking()
             .Select(c => new CollectionDto
             {
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         return Ok(collections);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<CollectionDto>> GetById(Guid id)
+    public async Task<ActionResult<CollectionDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var collection = await _dbContext.Collections
-            .FirstOrDefaultAsync(e => e.Id == id && e.OwnerId == userId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id && e.OwnerId == userId, cancellationToken);
 
         if (collection == null)
             return NotFound();
@@ -64,7 +66,7 @@ public class CollectionsController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult<CollectionDto>> Create([FromBody] CreateCollectionDto dto)
+    public async Task<ActionResult<CollectionDto>> Create([FromBody] CreateCollectionDto dto, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
 
@@ -77,7 +79,7 @@ public class CollectionsController : ControllerBase
         };
 
         _dbContext.Collections.Add(entity);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, new CollectionDto
         {
@@ -88,11 +90,11 @@ public class CollectionsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<CollectionDto>> Update(Guid id, [FromBody] UpdateCollectionDto dto)
+    public async Task<ActionResult<CollectionDto>> Update(Guid id, [FromBody] UpdateCollectionDto dto, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var collection = await _dbContext.Collections
-            .FirstOrDefaultAsync(e => e.Id == id && e.OwnerId == userId);
+            .FirstOrDefaultAsync(e => e.Id == id && e.OwnerId == userId, cancellationToken);
 
         if (collection == null)
             return NotFound();
@@ -111,18 +113,18 @@ public class CollectionsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var collection = await _dbContext.Collections
-            .FirstOrDefaultAsync(e => e.Id == id && e.OwnerId == userId);
+            .FirstOrDefaultAsync(e => e.Id == id && e.OwnerId == userId, cancellationToken);
 
         if (collection == null)
             return NotFound();
 
         _dbContext.Collections.Remove(collection);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return NoContent();
     }
 }
