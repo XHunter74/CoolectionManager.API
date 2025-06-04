@@ -30,6 +30,8 @@ public class Startup
             options.UseOpenIddict<Guid>();
         });
 
+        services.AddMongoDbContext(Configuration);
+
         services.AddAppServices(Configuration);
 
         services.AddIdentityServices(Configuration);
