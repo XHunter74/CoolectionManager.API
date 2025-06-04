@@ -21,13 +21,14 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore CollectionManager.sln
 
-      - name: Build API project
-        run: dotnet build CollectionManager.API/CollectionManager.API.csproj --configuration Release --no-restore
+
+      - name: Build all projects
+        run: dotnet build CollectionManager.sln --configuration Release --no-restore
 
       - name: Find and run all test projects
         run: |
           for proj in $(find . -type f -name "*.csproj" | grep -i test); do
             echo "Running tests in $proj"
-            dotnet test "$proj" --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+            dotnet test "$proj" --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
           done
         shell: bash
