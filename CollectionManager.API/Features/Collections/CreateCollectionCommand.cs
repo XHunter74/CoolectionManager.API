@@ -18,7 +18,7 @@ public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCo
     public CreateCollectionCommandHandler(ILogger<CreateCollectionCommandHandler> logger, CollectionsDbContext dbContext)
     {
         _dbContext = dbContext;
-        _logger= logger
+        _logger = logger;
     }
 
     public async Task<CollectionDto> HandleAsync(CreateCollectionCommand command, CancellationToken cancellationToken)
