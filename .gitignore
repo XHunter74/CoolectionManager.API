@@ -8,3 +8,5 @@ CollectionManager.Data/bin/
 CollectionManager.Shared/bin/
 CollectionManager.Shared/obj/
 CollectionManager.API/Storage/
+CollectionManager.Shared.Test/bin/
+CollectionManager.Shared.Test/obj/
