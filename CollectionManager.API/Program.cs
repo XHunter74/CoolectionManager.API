@@ -5,7 +5,7 @@ using xhunter74.CollectionManager.Data.Extensions;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +20,9 @@ public class Program
         var env = app.Services.GetRequiredService<IWebHostEnvironment>();
         startup.Configure(app, env);
 
-        app.ApplyDbMigrations();
+        await app.ApplyDbMigrations();
 
-        app.SeedIdentityEntities();
+        await app.SeedIdentityEntities();
 
         app.Run();
     }

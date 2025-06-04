@@ -12,17 +12,17 @@ namespace xhunter74.CollectionManager.API.Extensions;
 
 public static class IdentityExtensions
 {
-    public static void SeedIdentityEntities(this IHost host)
+    public static async Task<IHost> SeedIdentityEntities(this IHost host)
     {
         using var scope = host.Services.CreateScope();
         using var context = (DbContext)scope.ServiceProvider.GetRequiredService<CollectionsDbContext>();
         var identitySettings = scope.ServiceProvider.GetRequiredService<IOptions<IdentitySettings>>().Value;
 
         var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
-        var existingClientApp = manager.FindByClientIdAsync(identitySettings.DefaultClientId).GetAwaiter().GetResult();
+        var existingClientApp = await manager.FindByClientIdAsync(identitySettings.DefaultClientId);
         if (existingClientApp == null)
         {
-            manager.CreateAsync(new OpenIddictApplicationDescriptor
+            await manager.CreateAsync(new OpenIddictApplicationDescriptor
             {
                 ClientId = identitySettings.DefaultClientId,
                 ClientSecret = identitySettings.DefaultClientSecret,
@@ -33,7 +33,7 @@ public static class IdentityExtensions
                         OpenIddictConstants.Permissions.GrantTypes.Password,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                     }
-            }).GetAwaiter().GetResult();
+            });
         }
 
         var userManager = scope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
@@ -45,14 +45,14 @@ public static class IdentityExtensions
             var superAdminPassword = identitySettings.SuperAdminPassword;
             var superAdminRole = "SuperAdmin";
 
-            var roleExists = roleManager.RoleExistsAsync(superAdminRole).GetAwaiter().GetResult();
+            var roleExists = await roleManager.RoleExistsAsync(superAdminRole);
             if (!roleExists)
             {
                 var role = new IdentityRole<Guid> { Name = superAdminRole };
-                roleManager.CreateAsync(role).GetAwaiter().GetResult();
+                await roleManager.CreateAsync(role);
             }
 
-            var superAdminUser = userManager.FindByEmailAsync(superAdminEmail).GetAwaiter().GetResult();
+            var superAdminUser = await userManager.FindByEmailAsync(superAdminEmail);
             if (superAdminUser == null)
             {
                 superAdminUser = new ApplicationUser
@@ -61,22 +61,23 @@ public static class IdentityExtensions
                     Email = superAdminEmail,
                     EmailConfirmed = true
                 };
-                var result = userManager.CreateAsync(superAdminUser, superAdminPassword).GetAwaiter().GetResult();
+                var result = await userManager.CreateAsync(superAdminUser, superAdminPassword);
                 if (result.Succeeded)
                 {
-                    userManager.AddToRoleAsync(superAdminUser, superAdminRole).GetAwaiter().GetResult();
-                    userManager.AddClaimAsync(superAdminUser, new Claim(AppClaimTypes.UserPermissionClaim, Permissions.Permissions.ViewUser)).GetAwaiter().GetResult();
+                    await userManager.AddToRoleAsync(superAdminUser, superAdminRole);
+                    await userManager.AddClaimAsync(superAdminUser, new Claim(AppClaimTypes.UserPermissionClaim, Permissions.Permissions.ViewUser));
                 }
             }
             else
             {
-                var inRole = userManager.IsInRoleAsync(superAdminUser, superAdminRole).GetAwaiter().GetResult();
+                var inRole = await userManager.IsInRoleAsync(superAdminUser, superAdminRole);
                 if (!inRole)
                 {
-                    userManager.AddToRoleAsync(superAdminUser, superAdminRole).GetAwaiter().GetResult();
+                    await userManager.AddToRoleAsync(superAdminUser, superAdminRole);
                 }
             }
         }
+        return host;
     }
 
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration)
