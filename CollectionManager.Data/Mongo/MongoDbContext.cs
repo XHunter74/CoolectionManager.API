@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Collections;
 
 namespace xhunter74.CollectionManager.Data.Mongo;
 
