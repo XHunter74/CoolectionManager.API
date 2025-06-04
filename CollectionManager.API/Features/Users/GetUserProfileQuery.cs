@@ -16,7 +16,7 @@ public class GetUserProfileQueryHandler : BaseFeatureHandler, IQueryHandler<GetU
     private readonly UserManager<ApplicationUser> _userManager;
 
     public GetUserProfileQueryHandler(
-        ILogger<CreateUserHandler> logger,
+        ILogger<GetUserProfileQueryHandler> logger,
         UserManager<ApplicationUser> userManager
         ) : base(logger)
     {

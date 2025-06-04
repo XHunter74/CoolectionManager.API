@@ -18,7 +18,7 @@ public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<Up
     private readonly IStorageService _storageService;
 
     public UploadAvatarCommandHandler(
-        ILogger<CreateUserHandler> logger,
+        ILogger<UploadAvatarCommandHandler> logger,
         UserManager<ApplicationUser> userManager,
         IStorageService storageService
         ) : base(logger)
