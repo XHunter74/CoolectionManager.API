@@ -131,7 +131,20 @@ public class UsersController : ControllerBase
         return Created();
     }
 
+    /// <summary>
+    /// Gets the avatar of the currently authenticated user.
+    /// </summary>
+    /// <remarks>
+    /// Returns the avatar image file for the authenticated user.
+    /// </remarks>
+    /// <returns>The avatar file as a binary stream.</returns>
+    /// <response code="200">Returns the avatar file.</response>
+    /// <response code="401">Unauthorized. The user is not authenticated.</response>
+    /// <response code="404">Avatar not found for the user.</response>
     [HttpGet("avatar")]
+    [ProducesResponseType(typeof(FileContentResult), 200)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetUserAvatarAsync()
     {
         var userId = User.UserId();
