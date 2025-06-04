@@ -28,5 +28,6 @@ jobs:
         run: |
           for proj in $(find . -type f -name "*.csproj" | grep -i test); do
             echo "Running tests in $proj"
-            dotnet test "$proj" --configuration Release --no-build --verbosity normal
+            dotnet test "$proj" --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
           done
+        shell: bash
