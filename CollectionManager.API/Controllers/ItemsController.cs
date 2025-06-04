@@ -36,7 +36,7 @@ public class ItemsController : ControllerBase
         _mongoDbContext = mongoDbContext;
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("/api/Collections/{id:guid}/[controller]")]
     public async Task<IActionResult> GetItemsAsync(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -59,8 +59,37 @@ public class ItemsController : ControllerBase
         return Ok(items);
     }
 
-    [HttpGet("{collectionId:guid}/{id:guid}")]
-    public async Task<IActionResult> GetItemByIdAsync(Guid collectionId, Guid id, CancellationToken cancellationToken)
+    [HttpGet("{id:guid}", Name = nameof(GetItemByIdAsync))]
+    public async Task<IActionResult> GetItemByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = User.UserId();
+
+        var item = await _mongoDbContext.CollectionItems
+            .GetByIdAsync(id, cancellationToken);
+
+        if (item == null)
+        {
+            _logger.LogWarning("Item with ID {Id} not found for user {UserId}", id, userId);
+            return NotFound(new { Message = "Item not found" });
+        }
+
+        var collection = await _dbContext.Collections
+            .Include(c => c.Fields)
+            .AsNoTracking()
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(c => c.Id == item.CollectionId && c.OwnerId == userId, cancellationToken);
+
+        if (collection == null)
+        {
+            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", id, userId);
+            return NotFound(new { Message = "Collection not found" });
+        }
+
+        return Ok(item);
+    }
+
+    [HttpPost("/api/Collections/{collectionId:guid}/[controller]")]
+    public async Task<IActionResult> CreateItemAsync(Guid collectionId, [FromBody] CreateItemDto[] model, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
 
@@ -69,36 +98,13 @@ public class ItemsController : ControllerBase
             .AsNoTracking()
             .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == collectionId && c.OwnerId == userId, cancellationToken);
-
         if (collection == null)
         {
-            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", id, userId);
+            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", collectionId, userId);
             return NotFound(new { Message = "Collection not found" });
         }
 
-        var item = await _mongoDbContext.CollectionItems
-            .GetByIdAsync(id, cancellationToken);
-
-        return Ok(item);
-    }
-
-    [HttpPost("{id:guid}")]
-    public async Task<IActionResult> CreateItemAsync(Guid id, [FromBody] CreateItemDto[] model, CancellationToken cancellationToken)
-    {
-        var userId = User.UserId();
-
-        var collection = await _dbContext.Collections
-            .Include(c => c.Fields)
-            .AsNoTracking()
-            .AsSplitQuery()
-            .FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == userId, cancellationToken);
-        if (collection == null)
-        {
-            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", id, userId);
-            return NotFound(new { Message = "Collection not found" });
-        }
-
-        var itemDoc = new DynamicItemRecord { CollectionId = id };
+        var itemDoc = new DynamicItemRecord { CollectionId = collectionId };
 
         foreach (var item in model)
         {
@@ -107,7 +113,7 @@ public class ItemsController : ControllerBase
 
             if (field == null)
             {
-                _logger.LogWarning("Field with name {FieldName} not found in collection {CollectionId} for user {UserId}", item.Name, id, userId);
+                _logger.LogWarning("Field with name {FieldName} not found in collection {CollectionId} for user {UserId}", item.Name, collectionId, userId);
                 return BadRequest(new { Message = "Field not found in collection" });
             }
 
@@ -116,8 +122,6 @@ public class ItemsController : ControllerBase
 
         var newItem = await _mongoDbContext.CollectionItems.AddAsync(itemDoc, cancellationToken);
 
-        return Ok(newItem);
-
-        //return CreatedAtRoute(nameof(GetItemByIdAsync), new { id = newItem.Id }, newItem);
+        return CreatedAtRoute(nameof(GetItemByIdAsync), new { id = newItem.Id }, newItem);
     }
 }

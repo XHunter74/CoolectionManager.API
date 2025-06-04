@@ -27,8 +27,8 @@ public class CollectionFieldsController: ControllerBase
         _dbContext = dbContext;
     }
 
-    [HttpGet("{collectionId:guid}")]
-    public async Task<ActionResult<IEnumerable<CollectionFieldDto>>> GetFields(Guid collectionId, 
+    [HttpGet("/api/Collections/{collectionId:guid}/[controller]")]
+    public async Task<ActionResult<IEnumerable<CollectionFieldDto>>> GetCollectionFields(Guid collectionId, 
         CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -55,7 +55,7 @@ public class CollectionFieldsController: ControllerBase
         return Ok(fields);
     }
 
-    [HttpGet("field/{id:guid}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<CollectionFieldDto>> GetFieldById(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -79,7 +79,7 @@ public class CollectionFieldsController: ControllerBase
         });
     }
 
-    [HttpPost("{collectionId:guid}")]
+    [HttpPost("/api/Collections/{collectionId:guid}/[controller]")]
     public async Task<ActionResult<CollectionFieldDto>> Create(Guid collectionId, [FromBody] CreateCollectionFieldDto model, 
         CancellationToken cancellationToken)
     {
@@ -118,7 +118,7 @@ public class CollectionFieldsController: ControllerBase
         });
     }
 
-    [HttpPut("field/{id:guid}")]
+    [HttpPut("{id:guid}")]
     public async Task<ActionResult<CollectionFieldDto>> Update(Guid id, [FromBody] UpdateCollectionFieldDto model, 
         CancellationToken cancellationToken)
     {
@@ -150,7 +150,7 @@ public class CollectionFieldsController: ControllerBase
         });
     }
 
-    [HttpDelete("field/{id:guid}")]
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
