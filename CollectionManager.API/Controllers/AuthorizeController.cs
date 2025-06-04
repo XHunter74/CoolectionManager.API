@@ -10,13 +10,20 @@ using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
+/// <summary>
+/// Handles authentication and token exchange for OpenIddict flows.
+/// </summary>
 [ApiController]
+[Route("[controller]")]
 public class AuthorizationController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICqrsMediatr _mediatr;
 
+    /// <summary>
+    /// Constructor for AuthorizationController.
+    /// </summary>
     public AuthorizationController(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
@@ -28,9 +35,20 @@ public class AuthorizationController : Controller
         _mediatr = mediatr;
     }
 
+    /// <summary>
+    /// Token endpoint for OpenIddict. Supports password and refresh_token grant types.
+    /// </summary>
+    /// <remarks>
+    /// Use <c>grant_type=password</c> for username/password authentication, or <c>grant_type=refresh_token</c> to refresh tokens.
+    /// </remarks>
+    /// <returns>OpenIddict token response or error.</returns>
+    /// <response code="200">Returns a valid token response.</response>
+    /// <response code="400">Invalid request or credentials.</response>
     [HttpPost("~/connect/token"), IgnoreAntiforgeryToken]
     [Consumes("application/x-www-form-urlencoded")]
     [Produces("application/json")]
+    [ProducesResponseType(typeof(OpenIddictResponse), 200)]
+    [ProducesResponseType(typeof(OpenIddictResponse), 400)]
     public async Task<IActionResult> Exchange()
     {
         var oidcRequest = HttpContext.GetOpenIddictServerRequest();
