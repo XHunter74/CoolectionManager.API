@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using CQRSMediatr.Interfaces;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,9 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using System.Security.Claims;
+using xhunter74.CollectionManager.API.Features.Authorize;
 using xhunter74.CollectionManager.API.Permissions;
 using xhunter74.CollectionManager.Data.Entity;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
@@ -17,13 +18,17 @@ public class AuthorizationController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ICqrsMediatr _mediatr;
 
     public AuthorizationController(
         SignInManager<ApplicationUser> signInManager,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ICqrsMediatr mediatr
+        )
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _mediatr = mediatr;
     }
 
     [HttpPost("~/connect/token"), IgnoreAntiforgeryToken]
@@ -33,7 +38,15 @@ public class AuthorizationController : Controller
     {
         var oidcRequest = HttpContext.GetOpenIddictServerRequest();
         if (oidcRequest.IsPasswordGrantType())
-            return await TokensForPasswordGrantType(oidcRequest);
+        {
+            var command = new GetTokenForPasswordCommand
+            {
+                Username = oidcRequest.Username,
+                Password = oidcRequest.Password
+            };
+            var result = await _mediatr.SendAsync(command);
+            return result;
+        }
 
         if (oidcRequest.IsRefreshTokenGrantType())
             return await TokensForRefreshTokenGrantType();
@@ -43,23 +56,6 @@ public class AuthorizationController : Controller
             Error = OpenIddictConstants.Errors.UnsupportedGrantType
         });
     }
-
-    private async Task<IActionResult> TokensForPasswordGrantType(OpenIddictRequest request)
-    {
-        var user = await _userManager.FindByNameAsync(request.Username);
-        if (user == null)
-            return Unauthorized();
-
-        var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-        if (signInResult.Succeeded)
-        {
-            var result = await CreateTokenForUserAsync(user);
-            return result;
-        }
-        else
-            return Unauthorized();
-    }
-
 
     private async Task<Microsoft.AspNetCore.Mvc.SignInResult> CreateTokenForUserAsync(ApplicationUser user)
     {
