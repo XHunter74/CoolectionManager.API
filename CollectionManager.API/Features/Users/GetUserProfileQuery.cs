@@ -25,8 +25,6 @@ public class GetUserProfileQueryHandler : BaseFeatureHandler, IQueryHandler<GetU
 
     public async Task<UserProfileDto> HandleAsync(GetUserProfileQuery query, CancellationToken cancellationToken)
     {
-
-
         var user = await _userManager.FindByIdAsync(query.UserId.ToString());
         if (user == null)
         {

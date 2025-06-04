@@ -131,4 +131,16 @@ public class UsersController : ControllerBase
 
         return Created();
     }
+
+    [HttpGet("avatar")]
+    public async Task<IActionResult> GetUserAvatarAsync()
+    {
+        var userId = User.UserId();
+        var query= new GetUserAvatarQuery
+        {
+            UserId = userId
+        };
+        var avatar = await _mediatr.QueryAsync(query);
+        return File(avatar, "image/jpeg", "avatar.jpeg");
+    }
 }
