@@ -123,7 +123,7 @@ public class UsersController : ControllerBase
         await file.CopyToAsync(memoryStream);
         byte[] avatarBytes = memoryStream.ToArray();
 
-        _ = await _mediatr.SendAsync(new UploadImageCommand
+        _ = await _mediatr.SendAsync(new UploadUserImageCommand
         {
             UserId = User.UserId(),
             Sources = avatarBytes
@@ -149,7 +149,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUserAvatarAsync()
     {
         var userId = User.UserId();
-        var query = new GetImageQuery
+        var query = new DownloadUserImageQuery
         {
             UserId = userId
         };

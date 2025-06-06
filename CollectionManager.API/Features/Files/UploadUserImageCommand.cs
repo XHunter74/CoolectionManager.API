@@ -6,20 +6,20 @@ using xhunter74.CollectionManager.Shared.Services.Interfaces;
 
 namespace xhunter74.CollectionManager.API.Features.Files;
 
-public class UploadImageCommand : ICommand<bool>
+public class UploadUserImageCommand : ICommand<bool>
 {
     public Guid UserId { get; init; }
     public byte[] Sources { get; set; }
 }
 
-public class UploadImageCommandHandler : BaseFeatureHandler, ICommandHandler<UploadImageCommand, bool>
+public class UploadUserImageCommandHandler : BaseFeatureHandler, ICommandHandler<UploadUserImageCommand, bool>
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStorageService _storageService;
     private readonly IImageService _imageService;
 
-    public UploadImageCommandHandler(
-        ILogger<UploadImageCommandHandler> logger,
+    public UploadUserImageCommandHandler(
+        ILogger<UploadUserImageCommandHandler> logger,
         UserManager<ApplicationUser> userManager,
         IStorageService storageService,
         IImageService imageService
@@ -30,7 +30,7 @@ public class UploadImageCommandHandler : BaseFeatureHandler, ICommandHandler<Upl
         _imageService = imageService;
     }
 
-    public async Task<bool> HandleAsync(UploadImageCommand command, CancellationToken cancellationToken)
+    public async Task<bool> HandleAsync(UploadUserImageCommand command, CancellationToken cancellationToken)
     {
         try
         {

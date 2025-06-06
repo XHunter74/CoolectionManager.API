@@ -6,18 +6,18 @@ using xhunter74.CollectionManager.Shared.Services.Interfaces;
 
 namespace xhunter74.CollectionManager.API.Features.Files;
 
-public class GetImageQuery : IQuery<byte[]>
+public class DownloadUserImageQuery : IQuery<byte[]>
 {
     public Guid UserId { get; set; }
 }
 
-public class GetImageQueryHandler : BaseFeatureHandler, IQueryHandler<GetImageQuery, byte[]>
+public class DownloadUserImageQueryHandler : BaseFeatureHandler, IQueryHandler<DownloadUserImageQuery, byte[]>
 {
     private readonly IStorageService _storageService;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public GetImageQueryHandler(
-        ILogger<GetImageQueryHandler> logger,
+    public DownloadUserImageQueryHandler(
+        ILogger<DownloadUserImageQueryHandler> logger,
         IStorageService storageService,
         UserManager<ApplicationUser> userManager
         ) : base(logger)
@@ -26,7 +26,7 @@ public class GetImageQueryHandler : BaseFeatureHandler, IQueryHandler<GetImageQu
         _userManager = userManager;
     }
 
-    public async Task<byte[]> HandleAsync(GetImageQuery query, CancellationToken cancellationToken)
+    public async Task<byte[]> HandleAsync(DownloadUserImageQuery query, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(query.UserId.ToString());
         if (user == null)
