@@ -11,4 +11,5 @@ public static class Constants
         "text/plain",
         "application/octet-stream"
     ];
+    public const string IdFieldName = "Id";
 }

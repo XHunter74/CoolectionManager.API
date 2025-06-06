@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Features.Items;
 using xhunter74.CollectionManager.API.Models;
+using xhunter74.CollectionManager.Data.Mongo.Extensions;
 using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.API.Controllers;
@@ -71,12 +72,21 @@ public class ItemsController : ControllerBase
     public async Task<IActionResult> CreateItemAsync(Guid collectionId, [FromBody] CreateItemDto[] model, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
+
         var newItem = await _mediatr.SendAsync(new CreateItemCommand
         {
             CollectionId = collectionId,
             UserId = userId,
             Model = model
         }, cancellationToken);
-        return CreatedAtRoute(nameof(GetItemByIdAsync), new { id = newItem.Id }, newItem);
+
+        if (newItem == null)
+        {
+            return BadRequest("Failed to create item. Please check the provided data.");
+        }
+
+        var newItemId = newItem.GetFieldValue(Constants.IdFieldName);
+
+        return CreatedAtRoute(nameof(GetItemByIdAsync), new { id = newItemId }, newItem);
     }
 }

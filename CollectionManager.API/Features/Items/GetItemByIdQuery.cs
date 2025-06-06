@@ -1,19 +1,21 @@
 ﻿using CQRSMediatr.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Dynamic;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Data.Mongo;
+using xhunter74.CollectionManager.Data.Mongo.Extensions;
 using xhunter74.CollectionManager.Data.Mongo.Records;
 using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Features.Items;
 
-public class GetItemByIdQuery : IQuery<DynamicItemRecord>
+public class GetItemByIdQuery : IQuery<ExpandoObject>
 {
     public Guid ItemId { get; set; }
     public Guid UserId { get; set; }
 }
 
-public class GetItemByIdQueryHandler : IQueryHandler<GetItemByIdQuery, DynamicItemRecord>
+public class GetItemByIdQueryHandler : IQueryHandler<GetItemByIdQuery, ExpandoObject>
 {
     private readonly CollectionsDbContext _dbContext;
     private readonly IMongoDbContext _mongoDbContext;
@@ -26,7 +28,7 @@ public class GetItemByIdQueryHandler : IQueryHandler<GetItemByIdQuery, DynamicIt
         _logger = logger;
     }
 
-    public async Task<DynamicItemRecord> HandleAsync(GetItemByIdQuery query, CancellationToken cancellationToken)
+    public async Task<ExpandoObject> HandleAsync(GetItemByIdQuery query, CancellationToken cancellationToken)
     {
         var item = await _mongoDbContext.CollectionItems
             .GetByIdAsync(query.ItemId, cancellationToken);
@@ -48,6 +50,6 @@ public class GetItemByIdQueryHandler : IQueryHandler<GetItemByIdQuery, DynamicIt
             _logger.LogWarning("Collection with item ID {Id} not found for user {UserId}", query.ItemId, query.UserId);
             throw new NotFoundException($"Collection with item ID '{query.ItemId}' not found");
         }
-        return item;
+        return item.ToFlattenedExpando();
     }
 }

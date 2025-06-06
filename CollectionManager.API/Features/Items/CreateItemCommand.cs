@@ -1,22 +1,24 @@
 using CQRSMediatr.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using System.Dynamic;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Data.Mongo;
+using xhunter74.CollectionManager.Data.Mongo.Extensions;
 using xhunter74.CollectionManager.Data.Mongo.Records;
 using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Features.Items;
 
-public class CreateItemCommand : ICommand<DynamicItemRecord>
+public class CreateItemCommand : ICommand<ExpandoObject>
 {
     public Guid CollectionId { get; set; }
     public Guid UserId { get; set; }
     public CreateItemDto[] Model { get; set; }
 }
 
-public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, DynamicItemRecord>
+public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, ExpandoObject>
 {
     private readonly CollectionsDbContext _dbContext;
     private readonly IMongoDbContext _mongoDbContext;
@@ -29,7 +31,7 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, Dynam
         _logger = logger;
     }
 
-    public async Task<DynamicItemRecord> HandleAsync(CreateItemCommand command, CancellationToken cancellationToken)
+    public async Task<ExpandoObject> HandleAsync(CreateItemCommand command, CancellationToken cancellationToken)
     {
         var collection = await _dbContext.Collections
             .Include(c => c.Fields)
@@ -60,6 +62,6 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, Dynam
         }
         var newItem = await _mongoDbContext.CollectionItems.AddAsync(itemDoc, cancellationToken);
 
-        return newItem;
+        return newItem.ToFlattenedExpando();
     }
 }
