@@ -24,7 +24,7 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return document;
     }
 
-    public async Task<DynamicItemRecord> AddAsync(DynamicItemRecord entity, CancellationToken cancellationToken)
+    public virtual async Task<DynamicItemRecord> AddAsync(DynamicItemRecord entity, CancellationToken cancellationToken)
     {
         var intEntity = entity.ToDynamicRecord();
 
