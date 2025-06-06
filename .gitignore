@@ -10,3 +10,5 @@ CollectionManager.Shared/obj/
 CollectionManager.API/Storage/
 CollectionManager.Shared.Test/bin/
 CollectionManager.Shared.Test/obj/
+CollectionManager.Data.Test/bin/
+CollectionManager.Data.Test/obj/
