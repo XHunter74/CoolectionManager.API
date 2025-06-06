@@ -22,8 +22,8 @@ public class LocalStorageServiceTests : IDisposable
     [Fact(DisplayName = "UploadFileAsync creates file and can read back the same data")]
     public async Task UploadFileAsync_CreatesFileAndCanReadBack()
     {
-        await _service.UploadFileAsync(_userId, _fileId, _testData);
-        var result = await _service.GetFileAsync(_userId, _fileId);
+        await _service.UploadFileAsync(_userId, _fileId, _testData, CancellationToken.None);
+        var result = await _service.GetFileAsync(_userId, _fileId, CancellationToken.None);
         Assert.NotNull(result);
         Assert.Equal(_testData, result);
     }
@@ -31,24 +31,26 @@ public class LocalStorageServiceTests : IDisposable
     [Fact(DisplayName = "GetFileAsync returns null if file does not exist")]
     public async Task GetFileAsync_ReturnsNullIfFileDoesNotExist()
     {
-        var result = await _service.GetFileAsync(_userId, _fileId);
+        var result = await _service.GetFileAsync(_userId, _fileId, CancellationToken.None);
         Assert.Null(result);
     }
 
     [Fact(DisplayName = "DeleteFileAsync deletes file successfully")]
     public async Task DeleteFileAsync_DeletesFile()
     {
-        await _service.UploadFileAsync(_userId, _fileId, _testData);
-        await _service.DeleteFileAsync(_userId, _fileId);
-        var result = await _service.GetFileAsync(_userId, _fileId);
+        await _service.UploadFileAsync(_userId, _fileId, _testData, CancellationToken.None);
+        await _service.DeleteFileAsync(_userId, _fileId, CancellationToken.None);
+        var result = await _service.GetFileAsync(_userId, _fileId, CancellationToken.None);
         Assert.Null(result);
     }
 
     [Fact(DisplayName = "UploadFileAsync throws ArgumentException on null or empty input")]
     public async Task UploadFileAsync_ThrowsOnNullOrEmpty()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.UploadFileAsync(_userId, _fileId, null));
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.UploadFileAsync(_userId, _fileId, Array.Empty<byte>()));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.UploadFileAsync(_userId, 
+            _fileId, null, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.UploadFileAsync(_userId, _fileId, 
+            Array.Empty<byte>(), CancellationToken.None));
     }
 
     public void Dispose()

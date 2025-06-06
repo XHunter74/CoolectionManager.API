@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using xhunter74.CollectionManager.API.Extensions;
+using xhunter74.CollectionManager.API.Features.Files;
 using xhunter74.CollectionManager.API.Features.Users;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
@@ -122,7 +123,7 @@ public class UsersController : ControllerBase
         await file.CopyToAsync(memoryStream);
         byte[] avatarBytes = memoryStream.ToArray();
 
-        _ = await _mediatr.SendAsync(new UploadAvatarCommand
+        _ = await _mediatr.SendAsync(new UploadImageCommand
         {
             UserId = User.UserId(),
             Sources = avatarBytes
@@ -148,7 +149,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUserAvatarAsync()
     {
         var userId = User.UserId();
-        var query = new GetUserAvatarQuery
+        var query = new GetImageQuery
         {
             UserId = userId
         };

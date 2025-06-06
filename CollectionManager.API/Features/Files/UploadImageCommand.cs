@@ -4,22 +4,22 @@ using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Shared.Exceptions;
 using xhunter74.CollectionManager.Shared.Services.Interfaces;
 
-namespace xhunter74.CollectionManager.API.Features.Users;
+namespace xhunter74.CollectionManager.API.Features.Files;
 
-public class UploadAvatarCommand : ICommand<bool>
+public class UploadImageCommand : ICommand<bool>
 {
     public Guid UserId { get; init; }
     public byte[] Sources { get; set; }
 }
 
-public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<UploadAvatarCommand, bool>
+public class UploadImageCommandHandler : BaseFeatureHandler, ICommandHandler<UploadImageCommand, bool>
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStorageService _storageService;
     private readonly IImageService _imageService;
 
-    public UploadAvatarCommandHandler(
-        ILogger<UploadAvatarCommandHandler> logger,
+    public UploadImageCommandHandler(
+        ILogger<UploadImageCommandHandler> logger,
         UserManager<ApplicationUser> userManager,
         IStorageService storageService,
         IImageService imageService
@@ -30,7 +30,7 @@ public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<Up
         _imageService = imageService;
     }
 
-    public async Task<bool> HandleAsync(UploadAvatarCommand command, CancellationToken cancellationToken)
+    public async Task<bool> HandleAsync(UploadImageCommand command, CancellationToken cancellationToken)
     {
         try
         {

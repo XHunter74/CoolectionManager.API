@@ -1,24 +1,23 @@
 ﻿using CQRSMediatr.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using xhunter74.CollectionManager.Shared.Exceptions;
-using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Shared.Services.Interfaces;
 
-namespace xhunter74.CollectionManager.API.Features.Users;
+namespace xhunter74.CollectionManager.API.Features.Files;
 
-public class GetUserAvatarQuery : IQuery<byte[]>
+public class GetImageQuery : IQuery<byte[]>
 {
     public Guid UserId { get; set; }
 }
 
-public class GetUserAvatarQueryHandler : BaseFeatureHandler, IQueryHandler<GetUserAvatarQuery, byte[]>
+public class GetImageQueryHandler : BaseFeatureHandler, IQueryHandler<GetImageQuery, byte[]>
 {
     private readonly IStorageService _storageService;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public GetUserAvatarQueryHandler(
-        ILogger<GetUserAvatarQueryHandler> logger,
+    public GetImageQueryHandler(
+        ILogger<GetImageQueryHandler> logger,
         IStorageService storageService,
         UserManager<ApplicationUser> userManager
         ) : base(logger)
@@ -27,7 +26,7 @@ public class GetUserAvatarQueryHandler : BaseFeatureHandler, IQueryHandler<GetUs
         _userManager = userManager;
     }
 
-    public async Task<byte[]> HandleAsync(GetUserAvatarQuery query, CancellationToken cancellationToken)
+    public async Task<byte[]> HandleAsync(GetImageQuery query, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(query.UserId.ToString());
         if (user == null)
