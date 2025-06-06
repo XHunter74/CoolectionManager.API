@@ -1,11 +1,11 @@
 ﻿using MongoDB.Driver;
+using xhunter74.CollectionManager.Data.Mongo.Extensions;
 using xhunter74.CollectionManager.Data.Mongo.Repositories;
 
 namespace xhunter74.CollectionManager.Data.Mongo;
 
 public class MongoDbContext : IMongoDbContext
 {
-    private const string CollectionItemsCollectionName = "collection_items";
     private readonly IClientSessionHandle? _session;
     private bool _disposed;
 
@@ -19,16 +19,10 @@ public class MongoDbContext : IMongoDbContext
             _session.StartTransaction();
         }
 
-        var database = client.GetDatabase(databaseName);
+        var database = client.CreatedMongoDb(databaseName)
+            .CreateDbIndexes();
 
-        var existingCollections = database.ListCollectionNames().ToList();
-        if (!existingCollections.Contains(CollectionItemsCollectionName))
-        {
-            database.CreateCollection(CollectionItemsCollectionName);
-        }
-
-
-        CollectionItems = new CollectionsRepository(database, _session, CollectionItemsCollectionName);
+        CollectionItems = new CollectionsRepository(database, _session, MongoConstants.CollectionItemsCollectionName);
     }
 
     public async Task CommitAsync()
