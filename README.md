@@ -27,9 +27,9 @@ A .NET 9 Web API for managing customizable collections with user authentication,
 - `CollectionManager.API/` - Main Web API project
 
 ## Roadmap
-- [ ] Implement authentication and authorization
-- [ ] Add user, collection, and sharing models
-- [ ] CRUD endpoints for collections and fields
+- [X] Implement authentication and authorization
+- [X] Add user, collection, and sharing models
+- [X] CRUD endpoints for collections and fields
 - [ ] Collection sharing endpoints
 
 ## License
