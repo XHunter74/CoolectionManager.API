@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.Data.Mongo.Repositories;
@@ -15,7 +14,7 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         _session = session;
     }
 
-    public async Task<DynamicItemRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public virtual async Task<DynamicItemRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
         var intDocument = _session == null ? await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken)
@@ -40,7 +39,7 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return entity;
     }
 
-    public async Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken)
+    public virtual async Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
         DeleteResult result;
@@ -53,7 +52,7 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return result.DeletedCount > 0;
     }
 
-    public async Task<IEnumerable<DynamicItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
+    public virtual async Task<IEnumerable<DynamicItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq(ItemConstants.CollectionIdFieldName, collectionId.ToString());
         var allIntDocuments = _session == null ? await _collection.Find(filter).ToListAsync(cancellationToken)
@@ -65,7 +64,7 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return allDocuments;
     }
 
-    public async Task<bool> UpdateAsync(Guid id, DynamicItemRecord entity, CancellationToken cancellationToken)
+    public virtual async Task<bool> UpdateAsync(Guid id, DynamicItemRecord entity, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
 
