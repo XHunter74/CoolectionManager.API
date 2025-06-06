@@ -47,19 +47,18 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, Expan
 
         var itemDoc = new DynamicItemRecord { CollectionId = command.CollectionId };
 
-        foreach (var item in command.Model)
+        foreach (var field in collection.Fields)
         {
-            var field = collection.Fields
-                .FirstOrDefault(f => f.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase));
+            var item = command.Model.FirstOrDefault(i => i.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase));
 
-            if (field == null)
+            if (item == null && field.IsRequired)
             {
-                _logger.LogWarning("Field with name {FieldName} not found in collection {CollectionId} for user {UserId}", item.Name, command.CollectionId, command.UserId);
-                throw new BadRequestException($"Field '{item.Name}' not found in collection");
+                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}", field.Name, command.CollectionId, command.UserId);
+                throw new BadRequestException($"Required field '{field.Name}' is missing");
             }
-
             itemDoc.Fields.Add(field.Name, item.Value != null ? (BsonValue)item.Value : BsonNull.Value);
         }
+
         var newItem = await _mongoDbContext.CollectionItems.AddAsync(itemDoc, cancellationToken);
 
         return newItem.ToFlattenedExpando();
