@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using xhunter74.CollectionManager.API.Extensions;
-using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Data.Mongo.Records;
-using xhunter74.CollectionManager.Shared.Services.Interfaces;
-using File = xhunter74.CollectionManager.Data.Entity.File;
+using CQRSMediatr.Interfaces;
+using xhunter74.CollectionManager.API.Features.Files;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
@@ -15,42 +13,25 @@ namespace xhunter74.CollectionManager.API.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly ILogger<FilesController> _logger;
-    private readonly CollectionsDbContext _dbContext;
-    private readonly IStorageService _storageService;
+    private readonly ICqrsMediatr _mediatr;
 
-    public FilesController(ILogger<FilesController> logger, CollectionsDbContext dbContext,
-        IStorageService storageService)
+    public FilesController(ILogger<FilesController> logger, ICqrsMediatr mediatr)
     {
         _logger = logger;
-        _dbContext = dbContext;
-        _storageService = storageService;
+        _mediatr = mediatr;
     }
 
     [HttpGet("{id:guid}", Name = nameof(DownloadFileAsync))]
     public async Task<IActionResult> DownloadFileAsync(Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
-
-        var file = await _dbContext.Files
-            .FirstOrDefaultAsync(f => f.Id == id && f.Collection.OwnerId == userId, cancellationToken);
-
-        if (file == null)
+        var result = await _mediatr.QueryAsync(new DownloadFileQuery
         {
-            _logger.LogWarning("File with ID {Id} not found for user {UserId}", id, userId);
-            return NotFound(new { Message = "File not found" });
-        }
-
-        var fileBytes = await _storageService.GetFileAsync(userId, file.Id, cancellationToken);
-
-        if (fileBytes == null || fileBytes.Length == 0)
-        {
-            _logger.LogWarning("File content for ID {Id} not found in storage for user {UserId}", id, userId);
-            return NotFound(new { Message = "File content not found" });
-        }
-
-        return File(fileBytes, "application/octet-stream", file.Name);
+            FileId = id,
+            UserId = userId
+        }, cancellationToken);
+        return File(result.sources, "application/octet-stream", result.fileName);
     }
-
 
     [HttpPost("/api/Collections/{collectionId:guid}/[controller]")]
     [ProducesResponseType(typeof(DynamicItemRecord), 201)]
@@ -66,36 +47,24 @@ public class FilesController : ControllerBase
         }
 
         var file = Request.Form.Files[Constants.FileFormFieldName];
+
         if (file == null)
         {
-            return BadRequest("Avatar file not found in form data.");
+            return BadRequest("File not found in form data.");
         }
-
-        var collection = await _dbContext.Collections
-            .FirstOrDefaultAsync(c => c.Id == collectionId && c.OwnerId == userId, cancellationToken);
-
-        if (collection == null)
-        {
-            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", collectionId, userId);
-            return NotFound(new { Message = "Collection not found" });
-        }
-
-        var newFile = new File
-        {
-            Id = Guid.NewGuid(),
-            Name = file.FileName,
-            CollectionId = collectionId,
-        };
-
-        _dbContext.Files.Add(newFile);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         using var memoryStream = new MemoryStream();
-        await file.CopyToAsync(memoryStream);
-        byte[] avatarBytes = memoryStream.ToArray();
+        await file.CopyToAsync(memoryStream, cancellationToken);
+        byte[] fileBytes = memoryStream.ToArray();
 
-        await _storageService.UploadFileAsync(userId, newFile.Id, avatarBytes, cancellationToken);
+        var newFileId = await _mediatr.SendAsync(new UploadFileCommand
+        {
+            CollectionId = collectionId,
+            UserId = userId,
+            FileName = file.FileName,
+            Sources = fileBytes
+        }, cancellationToken);
 
-        return CreatedAtRoute(nameof(DownloadFileAsync), new { id = newFile.Id }, new { FileId = newFile.Id });
+        return CreatedAtRoute(nameof(DownloadFileAsync), new { id = newFileId }, new { FileId = newFileId });
     }
 }
