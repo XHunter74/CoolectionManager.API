@@ -39,7 +39,7 @@ public class UploadAvatarCommandHandler : BaseFeatureHandler, ICommandHandler<Up
 
             var pngSources = await _imageService.ConvertToPngAsync(command.Sources);
 
-            await _storageService.UploadFileAsync(user.Id, fileId, pngSources);
+            await _storageService.UploadFileAsync(user.Id, fileId, pngSources, cancellationToken);
 
             user.Avatar = fileId;
             var result = await _userManager.UpdateAsync(user);

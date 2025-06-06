@@ -37,7 +37,7 @@ public class GetUserAvatarQueryHandler : BaseFeatureHandler, IQueryHandler<GetUs
         if (!user.Avatar.HasValue)
             throw new NotFoundException("User does not have an avatar.");
 
-        var avatar = await _storageService.GetFileAsync(user.Id, user.Avatar.Value);
+        var avatar = await _storageService.GetFileAsync(user.Id, user.Avatar.Value, cancellationToken);
         return avatar!;
     }
 

@@ -17,7 +17,7 @@ public class LocalStorageService : BaseService, IStorageService
         }
     }
 
-    public Task DeleteFileAsync(Guid userId, Guid fileId)
+    public Task DeleteFileAsync(Guid userId, Guid fileId, CancellationToken cancellationToken)
     {
         var filePath = Path.Combine(_storageFolder, userId.ToString(), fileId.ToString());
         if (File.Exists(filePath))
@@ -31,7 +31,7 @@ public class LocalStorageService : BaseService, IStorageService
         return Task.CompletedTask;
     }
 
-    public async Task<byte[]?> GetFileAsync(Guid userId, Guid fileId)
+    public async Task<byte[]?> GetFileAsync(Guid userId, Guid fileId, CancellationToken cancellationToken)
     {
         var filePath = Path.Combine(_storageFolder, userId.ToString(), fileId.ToString());
         if (!File.Exists(filePath))
@@ -42,7 +42,7 @@ public class LocalStorageService : BaseService, IStorageService
 
         try
         {
-            return await File.ReadAllBytesAsync(filePath);
+            return await File.ReadAllBytesAsync(filePath, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -51,7 +51,7 @@ public class LocalStorageService : BaseService, IStorageService
         }
     }
 
-    public async Task UploadFileAsync(Guid userId, Guid fileId, byte[] sources)
+    public async Task UploadFileAsync(Guid userId, Guid fileId, byte[] sources, CancellationToken cancellationToken)
     {
         if (sources == null || sources.Length == 0)
             throw new ArgumentException("Source data is null or empty.", nameof(sources));
@@ -62,7 +62,7 @@ public class LocalStorageService : BaseService, IStorageService
 
         try
         {
-            await File.WriteAllBytesAsync(filePath, sources);
+            await File.WriteAllBytesAsync(filePath, sources, cancellationToken);
         }
         catch (Exception ex)
         {
