@@ -45,7 +45,7 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, Expan
             throw new NotFoundException($"Collection '{command.CollectionId}' not found");
         }
 
-        var itemDoc = new DynamicItemRecord { CollectionId = command.CollectionId };
+        var itemDoc = new CollectionItemRecord { CollectionId = command.CollectionId };
 
         foreach (var field in collection.Fields)
         {

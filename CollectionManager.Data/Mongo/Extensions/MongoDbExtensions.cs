@@ -21,7 +21,7 @@ public static class MongoDbExtensions
 
     public static IMongoDatabase CreateDbIndexes(this IMongoDatabase database)
     {
-        var intCollections = database.GetCollection<DynamicItemRecord>(MongoConstants.CollectionItemsCollectionName);
+        var intCollections = database.GetCollection<CollectionItemRecord>(MongoConstants.CollectionItemsCollectionName);
 
         var existingIndexes = intCollections.Indexes.List().ToList();
 
@@ -31,7 +31,7 @@ public static class MongoDbExtensions
 
         if (!hasCollectionIdIndex)
         {
-            var indexDefinition = Builders<DynamicItemRecord>.IndexKeys.Ascending(p => p.CollectionId);
+            var indexDefinition = Builders<CollectionItemRecord>.IndexKeys.Ascending(p => p.CollectionId);
 
             var indexOptions = new CreateIndexOptions
             {
@@ -39,7 +39,7 @@ public static class MongoDbExtensions
                 Background = true
             };
 
-            var indexModel = new CreateIndexModel<DynamicItemRecord>(indexDefinition, indexOptions);
+            var indexModel = new CreateIndexModel<CollectionItemRecord>(indexDefinition, indexOptions);
 
             intCollections.Indexes.CreateOne(indexModel);
         }

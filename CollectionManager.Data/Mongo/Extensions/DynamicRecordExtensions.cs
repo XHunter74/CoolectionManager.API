@@ -5,7 +5,7 @@ namespace xhunter74.CollectionManager.Data.Mongo.Extensions;
 
 public static class DynamicItemRecordExtensions
 {
-    public static ExpandoObject ToFlattenedExpando(this DynamicItemRecord record)
+    public static ExpandoObject ToFlattenedExpando(this CollectionItemRecord record)
     {
         var result = new ExpandoObject() as IDictionary<string, object>;
 
@@ -72,6 +72,11 @@ public static class DynamicItemRecordExtensions
                 continue;
             }
 
+            if (Guid.TryParse(str, out var guid))
+            {
+                result[key] = guid;
+                continue;
+            }
             result[key] = str;
         }
 

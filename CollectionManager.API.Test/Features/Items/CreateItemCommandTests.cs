@@ -68,7 +68,7 @@ public class CreateItemCommandTests : BaseConnectorTest<CreateItemCommandHandler
         CollectionsDbContext.Collections.Add(collection);
         CollectionsDbContext.SaveChanges();
 
-        var itemRecord = new DynamicItemRecord { CollectionId = collection.Id };
+        var itemRecord = new CollectionItemRecord { CollectionId = collection.Id };
 
         var mongoDbContext = new FakeMongoDbContext();
 

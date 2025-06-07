@@ -34,7 +34,7 @@ public class ImagesController : ControllerBase
     }
 
     [HttpPost("/api/Collections/{collectionId:guid}/[controller]")]
-    [ProducesResponseType(typeof(DynamicItemRecord), 201)]
+    [ProducesResponseType(typeof(CollectionItemRecord), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> UploadFileAsync(Guid collectionId, CancellationToken cancellationToken)

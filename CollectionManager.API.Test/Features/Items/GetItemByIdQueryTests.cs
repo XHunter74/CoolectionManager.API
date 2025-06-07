@@ -27,7 +27,7 @@ public class GetItemByIdQueryTests : BaseConnectorTest<GetItemByIdQueryHandler>
         var itemId = Guid.NewGuid();
         var collectionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var item = new DynamicItemRecord { Id = itemId, CollectionId = collectionId };
+        var item = new CollectionItemRecord { Id = itemId, CollectionId = collectionId };
         ((FakeMongoDbContext)MongoDbContextMock).AddItem(item);
         // No collection added to CollectionsDbContext
         var query = new GetItemByIdQuery { ItemId = itemId, UserId = userId };
@@ -40,7 +40,7 @@ public class GetItemByIdQueryTests : BaseConnectorTest<GetItemByIdQueryHandler>
         var itemId = Guid.NewGuid();
         var collectionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var item = new DynamicItemRecord { Id = itemId, CollectionId = collectionId };
+        var item = new CollectionItemRecord { Id = itemId, CollectionId = collectionId };
         ((FakeMongoDbContext)MongoDbContextMock).AddItem(item);
 
         CollectionsDbContext.Collections.Add(

@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace xhunter74.CollectionManager.Data.Mongo.Records;
 
-public class DynamicRecord
+public sealed class DynamicRecord
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]

@@ -9,7 +9,7 @@ public class DynamicRecordExtensionsTests
     public void ToFlattenedExpando_ReturnsExpectedProperties()
     {
         var now = DateTime.UtcNow;
-        var record = new DynamicItemRecord
+        var record = new CollectionItemRecord
         {
             Id = Guid.NewGuid(),
             CollectionId = Guid.NewGuid(),
@@ -43,7 +43,7 @@ public class DynamicRecordExtensionsTests
     [Fact(DisplayName = "GetFieldValue returns correct value for existing field and throws for missing field")]
     public void GetFieldValue_WorksAndThrows()
     {
-        var record = new DynamicItemRecord
+        var record = new CollectionItemRecord
         {
             Fields = new Dictionary<string, object> { { "TestField", 123 } }
         };

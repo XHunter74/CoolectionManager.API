@@ -3,7 +3,7 @@ using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.Data.Mongo.Repositories;
 
-public class CollectionsRepository : IRepository<DynamicItemRecord>
+public class CollectionsRepository : IRepository<CollectionItemRecord>
 {
     protected readonly IMongoCollection<DynamicRecord> _collection;
     protected readonly IClientSessionHandle? _session;
@@ -14,16 +14,16 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         _session = session;
     }
 
-    public virtual async Task<DynamicItemRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public virtual async Task<CollectionItemRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
         var intDocument = _session == null ? await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken)
             : await _collection.Find(_session, filter).FirstOrDefaultAsync(cancellationToken);
-        var document = intDocument == null ? null : new DynamicItemRecord(intDocument);
+        var document = intDocument == null ? null : new CollectionItemRecord(intDocument);
         return document;
     }
 
-    public virtual async Task<DynamicItemRecord> AddAsync(DynamicItemRecord entity, CancellationToken cancellationToken)
+    public virtual async Task<CollectionItemRecord> AddAsync(CollectionItemRecord entity, CancellationToken cancellationToken)
     {
         var intEntity = entity.ToDynamicRecord();
 
@@ -52,19 +52,19 @@ public class CollectionsRepository : IRepository<DynamicItemRecord>
         return result.DeletedCount > 0;
     }
 
-    public virtual async Task<IEnumerable<DynamicItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
+    public virtual async Task<IEnumerable<CollectionItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
     {
-        var filter = Builders<DynamicRecord>.Filter.Eq(ItemConstants.CollectionIdFieldName, collectionId.ToString());
+        var filter = Builders<DynamicRecord>.Filter.Eq(CollectionItemConstants.CollectionIdFieldName, collectionId.ToString());
         var allIntDocuments = _session == null ? await _collection.Find(filter).ToListAsync(cancellationToken)
             : await _collection.Find(_session, filter).ToListAsync(cancellationToken);
 
-        var allDocuments = allIntDocuments.Select(d => new DynamicItemRecord(d))
+        var allDocuments = allIntDocuments.Select(d => new CollectionItemRecord(d))
             .ToList();
 
         return allDocuments;
     }
 
-    public virtual async Task<bool> UpdateAsync(Guid id, DynamicItemRecord entity, CancellationToken cancellationToken)
+    public virtual async Task<bool> UpdateAsync(Guid id, CollectionItemRecord entity, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq("_id", id.ToString());
 

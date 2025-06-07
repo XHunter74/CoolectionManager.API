@@ -32,7 +32,7 @@ public class ItemsController : ControllerBase
     /// Gets all items for a specific collection owned by the current user.
     /// </summary>
     [HttpGet("/api/Collections/{id:guid}/[controller]")]
-    [ProducesResponseType(typeof(IEnumerable<DynamicItemRecord>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<CollectionItemRecord>), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetItemsAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -49,7 +49,7 @@ public class ItemsController : ControllerBase
     /// Gets a specific item by its unique identifier, if it belongs to a collection owned by the current user.
     /// </summary>
     [HttpGet("{id:guid}", Name = nameof(GetItemByIdAsync))]
-    [ProducesResponseType(typeof(DynamicItemRecord), 200)]
+    [ProducesResponseType(typeof(CollectionItemRecord), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetItemByIdAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -66,7 +66,7 @@ public class ItemsController : ControllerBase
     /// Creates a new item in a specific collection owned by the current user.
     /// </summary>
     [HttpPost("/api/Collections/{collectionId:guid}/[controller]")]
-    [ProducesResponseType(typeof(DynamicItemRecord), 201)]
+    [ProducesResponseType(typeof(CollectionItemRecord), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> CreateItemAsync(Guid collectionId, [FromBody] CreateItemDto[] model, CancellationToken cancellationToken)

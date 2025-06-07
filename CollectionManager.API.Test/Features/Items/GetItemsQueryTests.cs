@@ -55,8 +55,8 @@ public class GetItemsQueryTests : BaseConnectorTest<GetItemsQueryHandler>
     {
         var collectionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var item1 = new DynamicItemRecord { Id = Guid.NewGuid(), CollectionId = collectionId };
-        var item2 = new DynamicItemRecord { Id = Guid.NewGuid(), CollectionId = collectionId };
+        var item1 = new CollectionItemRecord { Id = Guid.NewGuid(), CollectionId = collectionId };
+        var item2 = new CollectionItemRecord { Id = Guid.NewGuid(), CollectionId = collectionId };
 
         ((FakeMongoDbContext)MongoDbContextMock).AddItem(item1);
         ((FakeMongoDbContext)MongoDbContextMock).AddItem(item2);
