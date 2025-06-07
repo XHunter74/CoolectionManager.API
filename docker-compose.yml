@@ -1,0 +1,18 @@
+services:
+  collections-manager.api:
+    image: collections-manager.api
+    ports:
+      - "5002:8080"
+      - "5003:8443"
+    environment:
+      ASPNETCORE_ENVIRONMENT: 'Development'
+    build:
+      args:
+        PROJECT_NAME: CollectionManager.API
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "C:/Sources/My Projects/Collection Manager API/Docker-Logs:/app/Logs"
+      - "C:/Sources/My Projects/Collection Manager API/CollectionManager.API/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro"
+ 
+  
