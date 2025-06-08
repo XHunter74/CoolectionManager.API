@@ -104,31 +104,31 @@ public static class IdentityExtensions
                        .ReplaceDefaultEntities<Guid>();
 
             })
-                .AddServer(options =>
-                {
-                    // Enable the required endpoints
-                    options.SetTokenEndpointUris("/connect/token");
+            .AddServer(options =>
+            {
+                // Enable the required endpoints
+                options.SetTokenEndpointUris("/connect/token");
 
-                    options.AllowPasswordFlow();
-                    options.AllowRefreshTokenFlow();
+                options.AllowPasswordFlow();
+                options.AllowRefreshTokenFlow();
 
-                    options.UseReferenceAccessTokens();
-                    options.UseReferenceRefreshTokens();
+                options.UseReferenceAccessTokens();
+                options.UseReferenceRefreshTokens();
 
-                    options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email,
-                                    OpenIddictConstants.Permissions.Scopes.Profile,
-                                    OpenIddictConstants.Permissions.Scopes.Roles);
+                options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email,
+                    OpenIddictConstants.Permissions.Scopes.Profile,
+                    OpenIddictConstants.Permissions.Scopes.Roles);
 
-                    options.SetAccessTokenLifetime(TimeSpan.FromSeconds(identitySettings.AccessTokenLifetime));
-                    options.SetRefreshTokenLifetime(TimeSpan.FromSeconds(identitySettings.RefreshTokenLifetime));
+                options.SetAccessTokenLifetime(TimeSpan.FromSeconds(identitySettings.AccessTokenLifetime));
+                options.SetRefreshTokenLifetime(TimeSpan.FromSeconds(identitySettings.RefreshTokenLifetime));
 
-                    //TODO - Change in production
-                    options.AddDevelopmentEncryptionCertificate()
-                        .AddDevelopmentSigningCertificate();
+                //TODO - Change in production
+                options.AddDevelopmentEncryptionCertificate()
+                    .AddDevelopmentSigningCertificate();
 
-                    options.UseAspNetCore().EnableTokenEndpointPassthrough();
-                })
-                .AddValidation(options =>
+                options.UseAspNetCore().EnableTokenEndpointPassthrough();
+            })
+            .AddValidation(options =>
                 {
                     options.UseLocalServer();
                     options.UseAspNetCore();
