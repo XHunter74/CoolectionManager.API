@@ -8,5 +8,10 @@ public class AppSettings
     public const string ConfigSection = "AppSettings";
 
     [Required]
-    public StorageServices StorageService { get; internal set; }
+    public StorageServices StorageService { get; set; }
+    [Required]
+    [EmailAddress]
+    public string FromEmail { get; set; }
+    [Required(AllowEmptyStrings = false)]
+    public string FromName { get; set; }
 }

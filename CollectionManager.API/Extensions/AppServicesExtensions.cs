@@ -1,7 +1,6 @@
 ﻿using CQRSMediatr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Options;
 using System.IO.Compression;
 using xhunter74.CollectionManager.API;
 using xhunter74.CollectionManager.API.Permissions.PolicyProvider;
@@ -47,8 +46,21 @@ public static class AppServicesExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<MailJetSettings>()
+            .Bind(configuration.GetSection(MailJetSettings.ConfigSection))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         var appSettings = configuration.GetSection(AppSettings.ConfigSection).Get<AppSettings>();
         var storageSettings = configuration.GetSection(StorageSettings.ConfigSection).Get<StorageSettings>();
+        var mailJetSettings = configuration.GetSection(MailJetSettings.ConfigSection).Get<MailJetSettings>();
+
+        services.AddSingleton<IEmailService, MailJetService>(x =>
+        {
+            var logger = x.GetRequiredService<ILogger<MailJetService>>();
+            return new MailJetService(logger, mailJetSettings!.ApiKey,
+                mailJetSettings.SecretKey, appSettings!.FromEmail, appSettings.FromName);
+        });
 
         switch (appSettings.StorageService)
         {
