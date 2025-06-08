@@ -39,4 +39,9 @@
 		<ProjectReference Include="..\CollectionManager.Shared\CollectionManager.Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="https\aspnetapp.pfx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>
