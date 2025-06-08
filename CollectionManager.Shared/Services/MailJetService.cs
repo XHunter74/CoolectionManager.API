@@ -33,19 +33,14 @@ public class MailJetService : IEmailService
         {
             Resource = Send.Resource,
         }
-        .Property(Send.Messages, new JArray {
-            new JObject {
-                {"From", new JObject {
-                    {"Email", _fromEmail},
-                    {"Name", _fromName}
-                  }},
-                {"To", new JArray {
-                    new JObject {
-                        {"Email", to},
-                        }
-                    }},
-                    {"Subject", subject},
-                    {"HTMLPart", body}
+        .Property(Send.FromEmail, _fromEmail)
+        .Property(Send.FromName, _fromName)
+        .Property(Send.Subject, subject)
+        .Property(Send.HtmlPart, body)
+        .Property(Send.Recipients,
+            new JArray {
+                new JObject {
+                    {"Email", to}
                 }
             });
         var response = await _mailjetClient.PostAsync(request);
