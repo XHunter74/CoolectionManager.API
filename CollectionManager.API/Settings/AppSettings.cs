@@ -14,4 +14,7 @@ public class AppSettings
     public string FromEmail { get; set; }
     [Required(AllowEmptyStrings = false)]
     public string FromName { get; set; }
+    [Required(AllowEmptyStrings = false)]
+    [Url]
+    public string SiteUrl { get; set; }
 }

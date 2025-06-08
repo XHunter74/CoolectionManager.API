@@ -12,7 +12,7 @@ using xhunter74.CollectionManager.Data.Entity;
 namespace xhunter74.CollectionManager.API.Controllers;
 
 /// <summary>
-/// Controller for user management operations such as registration, profile retrieval, and avatar upload.
+/// Controller for user management operations such as registration, profile retrieval, avatar upload, and password reset.
 /// </summary>
 [ApiController]
 [Authorize]
@@ -155,5 +155,75 @@ public class UsersController : ControllerBase
         };
         var avatar = await _mediatr.QueryAsync(query);
         return File(avatar, Constants.AvatarContentType, Constants.AvatarFileName);
+    }
+
+    /// <summary>
+    /// Generates a password reset link and sends it to the user's email address.
+    /// </summary>
+    /// <param name="userName">The username (email) of the user requesting password reset.</param>
+    /// <returns>Status of the operation.</returns>
+    /// <response code="200">Reset link generated and sent.</response>
+    /// <response code="400">Invalid username or user not found.</response>
+    [HttpPost("generate-reset-password-link")]
+    [AllowAnonymous]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(string), 400)]
+    public async Task<IActionResult> GenerateResetPasswordLinkAsync([FromQuery] string userName)
+    {
+        var command = new GenerateResetPasswordLinkCommand
+        {
+            UserName = userName
+        };
+        _ = await _mediatr.SendAsync(command);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Resets the user's password using a reset token.
+    /// </summary>
+    /// <param name="userId">The user's unique identifier.</param>
+    /// <param name="token">The password reset token.</param>
+    /// <returns>Status of the password reset operation.</returns>
+    /// <remarks>
+    /// The new password should be provided in the form field 'newPassword'.
+    /// </remarks>
+    /// <response code="200">Password reset successfully.</response>
+    /// <response code="400">Invalid user ID, token, or new password.</response>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(string), 400)]
+    public async Task<IActionResult> ResetPasswordAsync([FromQuery] Guid userId, [FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(token) || userId == Guid.Empty)
+        {
+            return BadRequest("Invalid user ID or token.");
+        }
+
+        string newPassword = null;
+        try
+        {
+            newPassword = Request.Form["newPassword"].ToString();
+        }
+        catch
+        {
+            //Do nothing
+        }
+
+        if (string.IsNullOrWhiteSpace(newPassword))
+        {
+            return BadRequest("New password cannot be empty.");
+        }
+
+        var command = new ResetPasswordCommand
+        {
+            UserId = userId,
+            Token = token,
+            NewPassword = newPassword
+        };
+
+        _ = await _mediatr.SendAsync(command);
+
+        return Ok();
     }
 }
