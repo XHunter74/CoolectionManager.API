@@ -18,6 +18,9 @@ public class Program
         var app = builder.Build();
 
         var env = app.Services.GetRequiredService<IWebHostEnvironment>();
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Application starting in '{Environment}' environment", env.EnvironmentName);
+
         startup.Configure(app, env);
 
         await app.ApplyDbMigrations();
