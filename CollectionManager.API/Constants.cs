@@ -14,5 +14,5 @@ public static class Constants
     ];
     public const string IdFieldName = "Id";
     public const string AuthTokenEndpoint = "/api/auth/token";
-    public const string DockerEnvironment = "docker";
+    public const string DockerEnvironment = "Docker";
 }

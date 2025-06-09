@@ -43,8 +43,13 @@ public class Startup
     {
         builder.UseResponseCompression();
 
-        if (env.IsDevelopment() || env.EnvironmentName == Constants.DockerEnvironment)
+        var logger = builder.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+
+        logger.LogInformation("Current environment is '{0}'", env.EnvironmentName);
+
+        if (env.IsDevelopment() || env.EnvironmentName.Equals( Constants.DockerEnvironment, StringComparison.InvariantCultureIgnoreCase))
         {
+            logger.LogInformation("Running in development environment. Enabling developer exception page and Swagger UI.");
             builder.UseDeveloperExceptionPage();
             builder.UseSwagger();
             var assembly = Assembly.GetEntryAssembly();
