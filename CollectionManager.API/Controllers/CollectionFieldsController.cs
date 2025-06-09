@@ -97,7 +97,7 @@ public class CollectionFieldsController : ControllerBase
             Model = model,
         }, cancellationToken);
 
-        return CreatedAtAction(nameof(GetFieldByIdAsync), new { id = result.Id }, result);
+        return CreatedAtRoute(nameof(GetFieldByIdAsync), new { id = result.Id }, result);
     }
 
     /// <summary>
