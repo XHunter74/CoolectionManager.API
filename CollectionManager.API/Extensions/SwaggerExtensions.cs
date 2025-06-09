@@ -15,7 +15,7 @@ public static class SwaggerExtensions
             {
                 var version = assembly
                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion;
+                    ?.InformationalVersion?.Split('+')[0];
                 var assemblyName = assembly.GetName().Name;
 
                 c.SwaggerDoc("v1", new OpenApiInfo
