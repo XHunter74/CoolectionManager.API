@@ -13,4 +13,5 @@ public static class Constants
         "application/octet-stream"
     ];
     public const string IdFieldName = "Id";
+    public const string AuthTokenEndpoint= "/api/auth/token";
 }

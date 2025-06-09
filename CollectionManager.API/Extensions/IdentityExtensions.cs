@@ -107,7 +107,7 @@ public static class IdentityExtensions
             .AddServer(options =>
             {
                 // Enable the required endpoints
-                options.SetTokenEndpointUris("/connect/token");
+                options.SetTokenEndpointUris(Constants.AuthTokenEndpoint);
 
                 options.AllowPasswordFlow();
                 options.AllowRefreshTokenFlow();

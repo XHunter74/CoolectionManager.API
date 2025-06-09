@@ -14,7 +14,7 @@ namespace xhunter74.CollectionManager.API.Controllers;
 /// Handles authentication and token exchange for OpenIddict flows.
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/auth")]
 public class AuthorizationController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -44,7 +44,7 @@ public class AuthorizationController : Controller
     /// <returns>OpenIddict token response or error.</returns>
     /// <response code="200">Returns a valid token response.</response>
     /// <response code="400">Invalid request or credentials.</response>
-    [HttpPost("~/connect/token"), IgnoreAntiforgeryToken]
+    [HttpPost("token"), IgnoreAntiforgeryToken]
     [Consumes("application/x-www-form-urlencoded")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(OpenIddictResponse), 200)]
