@@ -17,6 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.32.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
 		<PackageReference Include="cqrs-mediatr" Version="1.0.2" />

@@ -78,6 +78,8 @@ public static class AppServicesExtensions
         services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
+        services.AddAllElasticApm();
+
         return services;
     }
 }

@@ -43,7 +43,7 @@ public class Startup
     {
         builder.UseResponseCompression();
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.EnvironmentName == Constants.DockerEnvironment)
         {
             builder.UseDeveloperExceptionPage();
             builder.UseSwagger();
