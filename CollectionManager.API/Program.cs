@@ -2,11 +2,19 @@ using Serilog;
 using xhunter74.CollectionManager.API;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.Data.Extensions;
+using System.Reflection;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
+        var assembly = Assembly.GetEntryAssembly();
+        var version = assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion?.Split('+')[0];
+        if (!string.IsNullOrEmpty(version))
+        {
+            Environment.SetEnvironmentVariable("ELASTIC_APM_SERVICE_VERSION", version);
+        }
+
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((context, configuration) =>
