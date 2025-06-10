@@ -34,6 +34,12 @@ public class DeleteCollectionFieldCommandHandler : ICommandHandler<DeleteCollect
             throw new NotFoundException($"Field with ID {command.Id} not found");
         }
 
+        if (field.IsSystem)
+        {
+            _logger.LogWarning("There was an attempt to delete a system field with Id '{0}'", field.Id);
+            throw new BadRequestException("Couldn't delete system field");
+        }
+
         _dbContext.CollectionFields.Remove(field);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
