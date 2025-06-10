@@ -165,4 +165,27 @@ public class CollectionFieldsController : ControllerBase
 
         return Ok(types);
     }
+
+    /// <summary>
+    /// Changes the order of a field in a collection.
+    /// </summary>
+    /// <param name="id">The field's unique identifier.</param>
+    /// <param name="order">The new order value.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="200">Order changed successfully.</response>
+    /// <response code="404">Field not found or not owned by user.</response>
+    [HttpPut("{id:guid}/order")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> ChangeOrderAsync(Guid id, [FromQuery] int order, CancellationToken cancellationToken)
+    {
+        var userId = User.UserId();
+        var result = await _mediatr.SendAsync(new ChangeCollectionFieldOrderCommand
+        {
+            Id = id,
+            UserId = userId,
+            Order = order
+        }, cancellationToken);
+        return Ok();
+    }
 }
