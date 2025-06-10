@@ -9,6 +9,7 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public virtual DbSet<Collection> Collections { get; set; }
     public virtual DbSet<CollectionField> CollectionFields { get; set; }
     public virtual DbSet<File> Files { get; set; }
+    public virtual DbSet<PossibleValue> PossibleValues { get; set; }
 
     public CollectionsDbContext(DbContextOptions<CollectionsDbContext> options)
         : base(options) { }
@@ -49,6 +50,17 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasOne(e => e.Collection)
                 .WithMany(c => c.Files)
                 .HasForeignKey(e => e.CollectionId)
+                .HasPrincipalKey(e => e.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<PossibleValue>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Value).IsRequired().HasMaxLength(50);
+            entity.HasOne(e => e.CollectionField)
+                .WithMany(e => e.PossibleValues)
+                .HasForeignKey(e => e.CollectionFieldId)
                 .HasPrincipalKey(e => e.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });

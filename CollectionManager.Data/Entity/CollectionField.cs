@@ -12,4 +12,5 @@ public class CollectionField : BaseEntity
 
     public Guid CollectionId { get; set; }
     public Collection Collection { get; set; }
+    public ICollection<PossibleValue> PossibleValues { get; set; } = new List<PossibleValue>();
 }
