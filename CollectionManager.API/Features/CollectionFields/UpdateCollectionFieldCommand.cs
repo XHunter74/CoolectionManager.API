@@ -50,6 +50,7 @@ public class UpdateCollectionFieldCommandHandler : ICommandHandler<UpdateCollect
             Id = field.Id,
             Name = field.Name,
             Description = field.Description,
+            IsSystem = field.IsSystem,
             Type = field.Type,
             IsRequired = field.IsRequired,
             Order = field.Order,
