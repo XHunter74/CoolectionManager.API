@@ -86,7 +86,7 @@ public class CollectionsController : ControllerBase
             UserId = userId,
             Model = model
         }, cancellationToken);
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = newCollection.Id }, newCollection);
+        return CreatedAtRoute(nameof(GetByIdAsync), new { id = newCollection.Id }, newCollection);
     }
 
     /// <summary>
