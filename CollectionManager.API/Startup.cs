@@ -37,6 +37,17 @@ public class Startup
         services.AddIdentityServices(Configuration);
 
         services.AddSwaggerServices();
+
+        // Allow all origins CORS policy
+        services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+        });
     }
 
     public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
@@ -47,7 +58,7 @@ public class Startup
 
         logger.LogInformation("Current environment is '{0}'", env.EnvironmentName);
 
-        if (env.IsDevelopment() || env.EnvironmentName.Equals( Constants.DockerEnvironment, StringComparison.InvariantCultureIgnoreCase))
+        if (env.IsDevelopment() || env.EnvironmentName.Equals(Constants.DockerEnvironment, StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogInformation("Running in development environment. Enabling developer exception page and Swagger UI.");
             builder.UseDeveloperExceptionPage();
@@ -58,10 +69,10 @@ public class Startup
 
         builder.UseAppExceptionHandler();
 
+        builder.UseRouting();
+
         //TODO - Add CORS policy configuration
         builder.UseCors("CorsPolicy");
-
-        builder.UseRouting();
 
         builder.UseAuthentication();
         builder.UseAuthorization();
