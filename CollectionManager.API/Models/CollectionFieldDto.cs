@@ -9,6 +9,7 @@ public record CollectionFieldDto
     public string Name { get; init; }
     public string? Description { get; init; }
     public FieldTypes Type { get; init; }
+    public bool IsSystem { get; set; }
     public bool IsRequired { get; init; }
     public int Order { get; init; }
     public Guid CollectionId { get; init; }

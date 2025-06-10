@@ -42,6 +42,7 @@ public class GetCollectionFieldsQueryHandler : IQueryHandler<GetCollectionFields
             Id = f.Id,
             Name = f.Name,
             Description = f.Description,
+            IsSystem = f.IsSystem,
             Type = f.Type,
             IsRequired = f.IsRequired,
             Order = f.Order,
