@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace xhunter74.CollectionManager.Data.Entity;
+﻿namespace xhunter74.CollectionManager.Data.Entity;
 
 public enum FieldTypes
 {
