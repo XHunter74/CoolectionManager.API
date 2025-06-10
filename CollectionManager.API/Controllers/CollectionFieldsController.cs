@@ -145,4 +145,24 @@ public class CollectionFieldsController : ControllerBase
         }, cancellationToken);
         return NoContent();
     }
+
+    /// <summary>
+    /// Returns all available field types.
+    /// </summary>
+    /// <returns>List of field types.</returns>
+    [HttpGet("types")]
+    [ProducesResponseType(typeof(FieldTypeDto[]), 200)]
+    public IActionResult GetFieldTypes()
+    {
+        var types = Enum.GetValues<Data.Entity.FieldTypes>()
+            .Cast<Data.Entity.FieldTypes>()
+            .Select(e => new FieldTypeDto
+            {
+                Value = (int)e,
+                Name = e.ToString()
+            })
+            .ToArray();
+
+        return Ok(types);
+    }
 }
