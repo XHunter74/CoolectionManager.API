@@ -1,18 +1,19 @@
 using CQRSMediatr.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Features.CollectionFields;
 
-public class UpdatePossibleValueCommand : ICommand<PossibleValue?>
+public class UpdatePossibleValueCommand : ICommand<PossibleValueDto>
 {
     public Guid Id { get; set; }
-    public string Value { get; set; }
+    public PossibleValueDto Model { get; set; }
     public Guid UserId { get; set; }
 }
 
-public class UpdatePossibleValueCommandHandler : ICommandHandler<UpdatePossibleValueCommand, PossibleValue?>
+public class UpdatePossibleValueCommandHandler : ICommandHandler<UpdatePossibleValueCommand, PossibleValueDto>
 {
     private readonly CollectionsDbContext _dbContext;
     private readonly ILogger<UpdatePossibleValueCommandHandler> _logger;
@@ -23,7 +24,7 @@ public class UpdatePossibleValueCommandHandler : ICommandHandler<UpdatePossibleV
         _logger = logger;
     }
 
-    public async Task<PossibleValue?> HandleAsync(UpdatePossibleValueCommand command, CancellationToken cancellationToken)
+    public async Task<PossibleValueDto> HandleAsync(UpdatePossibleValueCommand command, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating possible value {PossibleValueId}", command.Id);
 
@@ -37,12 +38,18 @@ public class UpdatePossibleValueCommandHandler : ICommandHandler<UpdatePossibleV
             throw new NotFoundException($"Possible value {command.Id} not found or not owned by user");
         }
 
-        possibleValue.Value = command.Value;
-        
+        possibleValue.Value = command.Model.Value;
+
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
+
         _logger.LogInformation("Updated possible value {PossibleValueId}", command.Id);
-        
-        return possibleValue;
+
+        var result = new PossibleValueDto
+        {
+            Id = command.Id,
+            Value = possibleValue.Value
+        };
+
+        return result;
     }
 }

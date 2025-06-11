@@ -42,7 +42,8 @@ public class CollectionFieldsController : ControllerBase
     [HttpGet("/api/Collections/{collectionId:guid}/[controller]")]
     [ProducesResponseType(typeof(IEnumerable<CollectionFieldDto>), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<IEnumerable<CollectionFieldDto>>> GetCollectionFieldsAsync(Guid collectionId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CollectionFieldDto>>> GetCollectionFieldsAsync(Guid collectionId,
+        CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var result = await _mediatr.QueryAsync(new GetCollectionFieldsQuery
@@ -64,7 +65,8 @@ public class CollectionFieldsController : ControllerBase
     [HttpGet("{id:guid}", Name = nameof(GetFieldByIdAsync))]
     [ProducesResponseType(typeof(CollectionFieldDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<CollectionFieldDto>> GetFieldByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<CollectionFieldDto>> GetFieldByIdAsync(Guid id,
+        CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var result = await _mediatr.QueryAsync(new GetFieldByIdQuery
@@ -114,7 +116,8 @@ public class CollectionFieldsController : ControllerBase
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(CollectionFieldDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<CollectionFieldDto>> UpdateAsync(Guid id, [FromBody] UpdateCollectionFieldDto model,
+    public async Task<ActionResult<CollectionFieldDto>> UpdateAsync(Guid id,
+        [FromBody] UpdateCollectionFieldDto model,
         CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -179,7 +182,8 @@ public class CollectionFieldsController : ControllerBase
     [HttpPut("{id:guid}/order")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> ChangeOrderAsync(Guid id, [FromQuery] int order, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangeOrderAsync(Guid id, [FromQuery] int order,
+        CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var result = await _mediatr.SendAsync(new ChangeCollectionFieldOrderCommand
@@ -202,7 +206,8 @@ public class CollectionFieldsController : ControllerBase
     [HttpGet("{fieldId:guid}/possible-values")]
     [ProducesResponseType(typeof(IEnumerable<PossibleValue>), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<IEnumerable<PossibleValue>>> GetPossibleValuesAsync(Guid fieldId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PossibleValue>>> GetPossibleValuesAsync(Guid fieldId,
+        CancellationToken cancellationToken)
     {
         var query = new GetPossibleValuesQuery { FieldId = fieldId, UserId = User.UserId() };
         var result = await _mediatr.QueryAsync(query, cancellationToken);
@@ -221,7 +226,8 @@ public class CollectionFieldsController : ControllerBase
     [HttpGet("possible-values/{id:guid}")]
     [ProducesResponseType(typeof(PossibleValue), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<PossibleValue>> GetPossibleValueByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<PossibleValue>> GetPossibleValueByIdAsync(Guid id,
+        CancellationToken cancellationToken)
     {
         var query = new GetPossibleValueByIdQuery { Id = id, UserId = User.UserId() };
         var result = await _mediatr.QueryAsync(query, cancellationToken);
@@ -241,11 +247,13 @@ public class CollectionFieldsController : ControllerBase
     [HttpPost("{fieldId:guid}/possible-values")]
     [ProducesResponseType(typeof(PossibleValue), 201)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<PossibleValue>> CreatePossibleValueAsync(Guid fieldId, [FromBody] string value, CancellationToken cancellationToken)
+    public async Task<ActionResult<PossibleValue>> CreatePossibleValueAsync(Guid fieldId,
+        [FromBody] PossibleValueDto model, CancellationToken cancellationToken)
     {
-        var command = new CreatePossibleValueCommand { FieldId = fieldId, Value = value, UserId = User.UserId() };
+        var command = new CreatePossibleValueCommand { FieldId = fieldId, Model = model, UserId = User.UserId() };
+
         var result = await _mediatr.SendAsync(command, cancellationToken);
-        if (result == null) return NotFound();
+
         return CreatedAtAction(nameof(GetPossibleValueByIdAsync), new { id = result.Id }, result);
     }
 
@@ -261,9 +269,10 @@ public class CollectionFieldsController : ControllerBase
     [HttpPut("possible-values/{id:guid}")]
     [ProducesResponseType(typeof(PossibleValue), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<PossibleValue>> UpdatePossibleValueAsync(Guid id, [FromBody] string value, CancellationToken cancellationToken)
+    public async Task<ActionResult<PossibleValue>> UpdatePossibleValueAsync(Guid id, [FromBody] PossibleValueDto model,
+        CancellationToken cancellationToken)
     {
-        var command = new UpdatePossibleValueCommand { Id = id, Value = value, UserId = User.UserId() };
+        var command = new UpdatePossibleValueCommand { Id = id, Model = model, UserId = User.UserId() };
         var result = await _mediatr.SendAsync(command, cancellationToken);
         if (result == null) return NotFound();
         return Ok(result);

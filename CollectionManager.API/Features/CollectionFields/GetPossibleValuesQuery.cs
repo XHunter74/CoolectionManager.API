@@ -1,17 +1,18 @@
 using CQRSMediatr.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Features.CollectionFields;
 
-public class GetPossibleValuesQuery : IQuery<IEnumerable<PossibleValue>?>
+public class GetPossibleValuesQuery : IQuery<IEnumerable<PossibleValueDto>>
 {
     public Guid FieldId { get; set; }
     public Guid UserId { get; set; }
 }
 
-public class GetPossibleValuesQueryHandler : IQueryHandler<GetPossibleValuesQuery, IEnumerable<PossibleValue>?>
+public class GetPossibleValuesQueryHandler : IQueryHandler<GetPossibleValuesQuery, IEnumerable<PossibleValueDto>>
 {
     private readonly CollectionsDbContext _dbContext;
     private readonly ILogger<GetPossibleValuesQueryHandler> _logger;
@@ -22,7 +23,7 @@ public class GetPossibleValuesQueryHandler : IQueryHandler<GetPossibleValuesQuer
         _logger = logger;
     }
 
-    public async Task<IEnumerable<PossibleValue>?> HandleAsync(GetPossibleValuesQuery query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<PossibleValueDto>> HandleAsync(GetPossibleValuesQuery query, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Getting possible values for field {FieldId}", query.FieldId);
 
@@ -39,6 +40,11 @@ public class GetPossibleValuesQueryHandler : IQueryHandler<GetPossibleValuesQuer
         var values = await _dbContext.PossibleValues
             .AsNoTracking()
             .Where(v => v.CollectionFieldId == query.FieldId)
+            .Select(v => new PossibleValueDto
+            {
+                Id = v.Id,
+                Value = v.Value,
+            })
             .ToListAsync(cancellationToken);
 
         return values;
