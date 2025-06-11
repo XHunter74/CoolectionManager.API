@@ -33,6 +33,7 @@ public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCo
             Id = Guid.NewGuid(),
             Name = command.Model.Name,
             Description = command.Model.Description,
+            Image = command.Model.Image,
             OwnerId = command.UserId
         };
 
@@ -61,6 +62,7 @@ public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCo
             Id = newCollection.Id,
             Name = newCollection.Name,
             Description = newCollection.Description,
+            Image = newCollection.Image
         };
     }
 }

@@ -39,6 +39,8 @@ public class UpdateCollectionCommandHandler : ICommandHandler<UpdateCollectionCo
 
         collection.Name = command.Model.Name;
         collection.Description = command.Model.Description;
+        collection.Image = command.Model.Image;
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new CollectionDto

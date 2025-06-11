@@ -39,6 +39,7 @@ public class GetCollectionByIdQueryHandler : IQueryHandler<GetCollectionByIdQuer
             Id = collection.Id,
             Name = collection.Name,
             Description = collection.Description,
+            Image = collection.Image,
         };
     }
 }

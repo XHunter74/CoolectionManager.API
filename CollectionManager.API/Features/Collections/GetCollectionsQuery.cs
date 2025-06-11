@@ -26,6 +26,7 @@ public class GetCollectionsQueryHandler : IQueryHandler<GetCollectionsQuery, IEn
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+                Image = c.Image,
             })
             .ToListAsync(cancellationToken);
         return collections;
