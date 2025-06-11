@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CQRSMediatr.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using xhunter74.CollectionManager.API.Authorization;
 using xhunter74.CollectionManager.API.Extensions;
-using xhunter74.CollectionManager.Data.Mongo.Records;
-using CQRSMediatr.Interfaces;
 using xhunter74.CollectionManager.API.Features.Files;
+using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("api/[controller]")]
 public class ImagesController : ControllerBase
 {
@@ -22,7 +22,7 @@ public class ImagesController : ControllerBase
     }
 
     [HttpGet("/api/Collections/{collectionId:guid}/[controller]/{id:guid}", Name = nameof(DownloadImageAsync))]
-    [AllowAnonymous]
+    [UrlTokenAuthorizationFilter]
     public async Task<IActionResult> DownloadImageAsync(Guid collectionId, Guid id, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
@@ -39,6 +39,7 @@ public class ImagesController : ControllerBase
     [ProducesResponseType(typeof(CollectionItemRecord), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
+    [Authorize]
     public async Task<IActionResult> UploadImageAsync(Guid collectionId, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
