@@ -8,7 +8,7 @@ using File = xhunter74.CollectionManager.Data.Entity.File;
 
 namespace xhunter74.CollectionManager.API.Features.Files;
 
-public class UploadCollectionImageCommand : ICommand<bool>
+public class UploadCollectionImageCommand : ICommand<Guid>
 {
     public Guid UserId { get; init; }
     public Guid CollectionId { get; init; }
@@ -17,7 +17,7 @@ public class UploadCollectionImageCommand : ICommand<bool>
 }
 
 public class UploadCollectionImageCommandHandler : BaseFeatureHandler,
-    ICommandHandler<UploadCollectionImageCommand, bool>
+    ICommandHandler<UploadCollectionImageCommand, Guid>
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStorageService _storageService;
@@ -36,7 +36,7 @@ public class UploadCollectionImageCommandHandler : BaseFeatureHandler,
         _dbContext = dbContext;
     }
 
-    public async Task<bool> HandleAsync(UploadCollectionImageCommand command,
+    public async Task<Guid> HandleAsync(UploadCollectionImageCommand command,
         CancellationToken cancellationToken)
     {
         try
@@ -62,15 +62,16 @@ public class UploadCollectionImageCommandHandler : BaseFeatureHandler,
 
             try
             {
-                await _storageService.UploadFileAsync(command.UserId, file.Id, pngSources, cancellationToken);
+                await _storageService.UploadFileAsync(command.CollectionId, file.Id, pngSources, cancellationToken);
                 await _dbContext.Files.AddAsync(file, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error uploading file {FileName} for user {UserId}", command.FileName, command.UserId);
                 throw new AppErrorException("Failed to upload file.");
             }
-            return true;
+            return file.Id;
         }
         catch (Exception ex)
         {

@@ -48,6 +48,7 @@ public class UpdateCollectionCommandHandler : ICommandHandler<UpdateCollectionCo
             Id = collection.Id,
             Name = collection.Name,
             Description = collection.Description,
+            Image = collection.Image
         };
     }
 }

@@ -16,3 +16,4 @@ CollectionManager.API.Test/bin/
 CollectionManager.API.Test/obj/
 Docker-Logs/
 CollectionManager.API/appsettings.Docker.json
+Docker-Storage/

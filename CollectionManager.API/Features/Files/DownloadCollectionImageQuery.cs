@@ -35,7 +35,7 @@ public class DownloadCollectionImageQueryHandler : BaseFeatureHandler,
     {
         var collection = await _dbContext.Collections
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == query.CollectionId && c.OwnerId == query.UserId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == query.CollectionId, cancellationToken);
 
         if (collection == null)
         {
@@ -49,11 +49,11 @@ public class DownloadCollectionImageQueryHandler : BaseFeatureHandler,
 
         if (file == null)
         {
-            _logger.LogWarning("File with ID {Id} not found for user {UserId}", query.ImageId, query.UserId);
+            _logger.LogWarning("File with ID {Id} not found for collection {CollectionId}", query.ImageId, query.CollectionId);
             throw new NotFoundException("File does not exist with this Id.");
         }
 
-        var sources = await _storageService.GetFileAsync(query.UserId, query.ImageId, cancellationToken);
+        var sources = await _storageService.GetFileAsync(query.CollectionId, query.ImageId, cancellationToken);
 
         if (sources == null || sources.Length == 0)
         {

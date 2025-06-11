@@ -13,6 +13,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - "C:/Sources/My Projects/Collection Manager API/Docker-Logs:/app/Logs"
+      - "C:/Sources/My Projects/Collection Manager API/Docker-Storage:/app/Storage"
       - "C:/Sources/My Projects/Collection Manager API/CollectionManager.API/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro"
  
   
