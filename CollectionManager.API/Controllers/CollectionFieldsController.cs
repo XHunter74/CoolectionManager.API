@@ -239,7 +239,7 @@ public class CollectionFieldsController : ControllerBase
     /// Creates a new possible value for a specific collection field.
     /// </summary>
     /// <param name="fieldId">The field's unique identifier.</param>
-    /// <param name="model">The possible value data.</param>
+    /// <param name="value">The possible value data.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created possible value.</returns>
     /// <response code="201">Possible value created successfully.</response>
@@ -248,9 +248,9 @@ public class CollectionFieldsController : ControllerBase
     [ProducesResponseType(typeof(PossibleValue), 201)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<PossibleValue>> CreatePossibleValueAsync(Guid fieldId,
-        [FromBody] PossibleValueDto model, CancellationToken cancellationToken)
+         [FromQuery] string value, CancellationToken cancellationToken)
     {
-        var command = new CreatePossibleValueCommand { FieldId = fieldId, Model = model, UserId = User.UserId() };
+        var command = new CreatePossibleValueCommand { FieldId = fieldId, Value = value, UserId = User.UserId() };
 
         var result = await _mediatr.SendAsync(command, cancellationToken);
 
@@ -261,7 +261,7 @@ public class CollectionFieldsController : ControllerBase
     /// Updates an existing possible value.
     /// </summary>
     /// <param name="id">The possible value's unique identifier.</param>
-    /// <param name="model">The new value.</param>
+    /// <param name="value">The new value.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The updated possible value.</returns>
     /// <response code="200">Possible value updated successfully.</response>
@@ -269,10 +269,10 @@ public class CollectionFieldsController : ControllerBase
     [HttpPut("possible-values/{id:guid}")]
     [ProducesResponseType(typeof(PossibleValue), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<PossibleValue>> UpdatePossibleValueAsync(Guid id, [FromBody] PossibleValueDto model,
+    public async Task<ActionResult<PossibleValue>> UpdatePossibleValueAsync(Guid id, [FromQuery] string value,
         CancellationToken cancellationToken)
     {
-        var command = new UpdatePossibleValueCommand { Id = id, Model = model, UserId = User.UserId() };
+        var command = new UpdatePossibleValueCommand { Id = id, Value = value, UserId = User.UserId() };
         var result = await _mediatr.SendAsync(command, cancellationToken);
         if (result == null) return NotFound();
         return Ok(result);

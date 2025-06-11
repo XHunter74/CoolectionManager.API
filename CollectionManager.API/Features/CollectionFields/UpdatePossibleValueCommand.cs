@@ -9,7 +9,7 @@ namespace xhunter74.CollectionManager.API.Features.CollectionFields;
 public class UpdatePossibleValueCommand : ICommand<PossibleValueDto>
 {
     public Guid Id { get; set; }
-    public PossibleValueDto Model { get; set; }
+    public string Value { get; set; }
     public Guid UserId { get; set; }
 }
 
@@ -38,7 +38,7 @@ public class UpdatePossibleValueCommandHandler : ICommandHandler<UpdatePossibleV
             throw new NotFoundException($"Possible value {command.Id} not found or not owned by user");
         }
 
-        possibleValue.Value = command.Model.Value;
+        possibleValue.Value = command.Value;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

@@ -9,7 +9,7 @@ namespace xhunter74.CollectionManager.API.Features.CollectionFields;
 public class CreatePossibleValueCommand : ICommand<PossibleValueDto>
 {
     public Guid FieldId { get; set; }
-    public PossibleValueDto Model { get; set; }
+    public string Value { get; set; }
     public Guid UserId { get; set; }
 }
 
@@ -40,7 +40,7 @@ public class CreatePossibleValueCommandHandler : ICommandHandler<CreatePossibleV
         var possibleValue = new PossibleValue
         {
             Id = Guid.NewGuid(),
-            Value = command.Model.Value,
+            Value = command.Value,
             CollectionFieldId = command.FieldId
         };
 
@@ -52,7 +52,7 @@ public class CreatePossibleValueCommandHandler : ICommandHandler<CreatePossibleV
         var result = new PossibleValueDto
         {
             Id = possibleValue.Id,
-            Value = command.Model.Value
+            Value = possibleValue.Value
         };
 
         return result;
