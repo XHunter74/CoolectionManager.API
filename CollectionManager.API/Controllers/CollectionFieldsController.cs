@@ -223,7 +223,7 @@ public class CollectionFieldsController : ControllerBase
     /// <returns>The possible value.</returns>
     /// <response code="200">Returns the possible value.</response>
     /// <response code="404">Possible value not found or not owned by user.</response>
-    [HttpGet("possible-values/{id:guid}")]
+    [HttpGet("possible-values/{id:guid}", Name = nameof(GetPossibleValueByIdAsync))]
     [ProducesResponseType(typeof(PossibleValue), 200)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<PossibleValue>> GetPossibleValueByIdAsync(Guid id,
@@ -254,7 +254,7 @@ public class CollectionFieldsController : ControllerBase
 
         var result = await _mediatr.SendAsync(command, cancellationToken);
 
-        return CreatedAtAction(nameof(GetPossibleValueByIdAsync), new { id = result.Id }, result);
+        return CreatedAtRoute(nameof(GetPossibleValueByIdAsync), new { id = result.Id }, result);
     }
 
     /// <summary>
