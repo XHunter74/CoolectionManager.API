@@ -45,6 +45,7 @@ public class GetPossibleValuesQueryHandler : IQueryHandler<GetPossibleValuesQuer
                 Id = v.Id,
                 Value = v.Value,
             })
+            .OrderBy(o => o.Value)
             .ToListAsync(cancellationToken);
 
         return values;
