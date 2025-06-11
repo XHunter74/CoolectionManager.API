@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Features.CollectionFields;
 using xhunter74.CollectionManager.API.Models;
+using xhunter74.CollectionManager.Data.Entity;
 
 namespace xhunter74.CollectionManager.API.Controllers;
 
@@ -23,7 +24,8 @@ public class CollectionFieldsController : ControllerBase
     /// </summary>
     public CollectionFieldsController(
         ILogger<CollectionsController> logger,
-        ICqrsMediatr mediatr)
+        ICqrsMediatr mediatr
+        )
     {
         _logger = logger;
         _mediatr = mediatr;
@@ -187,5 +189,101 @@ public class CollectionFieldsController : ControllerBase
             Order = order
         }, cancellationToken);
         return Ok();
+    }
+
+    /// <summary>
+    /// Gets all possible values for a specific collection field.
+    /// </summary>
+    /// <param name="fieldId">The field's unique identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>List of possible values.</returns>
+    /// <response code="200">Returns the list of possible values.</response>
+    /// <response code="404">Field not found or not owned by user.</response>
+    [HttpGet("{fieldId:guid}/possible-values")]
+    [ProducesResponseType(typeof(IEnumerable<PossibleValue>), 200)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<IEnumerable<PossibleValue>>> GetPossibleValuesAsync(Guid fieldId, CancellationToken cancellationToken)
+    {
+        var query = new GetPossibleValuesQuery { FieldId = fieldId, UserId = User.UserId() };
+        var result = await _mediatr.QueryAsync(query, cancellationToken);
+        if (result == null) return NotFound();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Gets a specific possible value by its unique identifier.
+    /// </summary>
+    /// <param name="id">The possible value's unique identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The possible value.</returns>
+    /// <response code="200">Returns the possible value.</response>
+    /// <response code="404">Possible value not found or not owned by user.</response>
+    [HttpGet("possible-values/{id:guid}")]
+    [ProducesResponseType(typeof(PossibleValue), 200)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<PossibleValue>> GetPossibleValueByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var query = new GetPossibleValueByIdQuery { Id = id, UserId = User.UserId() };
+        var result = await _mediatr.QueryAsync(query, cancellationToken);
+        if (result == null) return NotFound();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Creates a new possible value for a specific collection field.
+    /// </summary>
+    /// <param name="fieldId">The field's unique identifier.</param>
+    /// <param name="model">The possible value data.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The created possible value.</returns>
+    /// <response code="201">Possible value created successfully.</response>
+    /// <response code="404">Field not found or not owned by user.</response>
+    [HttpPost("{fieldId:guid}/possible-values")]
+    [ProducesResponseType(typeof(PossibleValue), 201)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<PossibleValue>> CreatePossibleValueAsync(Guid fieldId, [FromBody] string value, CancellationToken cancellationToken)
+    {
+        var command = new CreatePossibleValueCommand { FieldId = fieldId, Value = value, UserId = User.UserId() };
+        var result = await _mediatr.SendAsync(command, cancellationToken);
+        if (result == null) return NotFound();
+        return CreatedAtAction(nameof(GetPossibleValueByIdAsync), new { id = result.Id }, result);
+    }
+
+    /// <summary>
+    /// Updates an existing possible value.
+    /// </summary>
+    /// <param name="id">The possible value's unique identifier.</param>
+    /// <param name="model">The new value.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The updated possible value.</returns>
+    /// <response code="200">Possible value updated successfully.</response>
+    /// <response code="404">Possible value not found or not owned by user.</response>
+    [HttpPut("possible-values/{id:guid}")]
+    [ProducesResponseType(typeof(PossibleValue), 200)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<PossibleValue>> UpdatePossibleValueAsync(Guid id, [FromBody] string value, CancellationToken cancellationToken)
+    {
+        var command = new UpdatePossibleValueCommand { Id = id, Value = value, UserId = User.UserId() };
+        var result = await _mediatr.SendAsync(command, cancellationToken);
+        if (result == null) return NotFound();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Deletes a possible value.
+    /// </summary>
+    /// <param name="id">The possible value's unique identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <response code="204">Possible value deleted successfully.</response>
+    /// <response code="404">Possible value not found or not owned by user.</response>
+    [HttpDelete("possible-values/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeletePossibleValueAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new DeletePossibleValueCommand { Id = id, UserId = User.UserId() };
+        var success = await _mediatr.SendAsync(command, cancellationToken);
+        if (!success) return NotFound();
+        return NoContent();
     }
 }
