@@ -4,9 +4,9 @@ public class CollectionItemRecord
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    public Guid CollectionId { get; set; }
-    public DateTime Created { get; set; } = DateTime.UtcNow;
-    public DateTime Updated { get; set; } = DateTime.UtcNow;
+    public Guid? CollectionId { get; set; }
+    public DateTime? Created { get; set; }
+    public DateTime? Updated { get; set; }
 
     public Dictionary<string, object> Fields { get; set; } = new();
 
@@ -15,9 +15,27 @@ public class CollectionItemRecord
     public CollectionItemRecord(DynamicRecord record)
     {
         Id = record.Id;
-        CollectionId = Guid.Parse(record.Fields.GetValueOrDefault(CollectionItemConstants.CollectionIdFieldName, string.Empty)?.ToString());
-        Created = DateTime.Parse(record.Fields.GetValueOrDefault(CollectionItemConstants.CreatedFieldName, DateTime.MinValue).ToString());
-        Updated = DateTime.Parse(record.Fields.GetValueOrDefault(CollectionItemConstants.UpdatedFieldName, DateTime.MinValue).ToString());
+        if (record.Fields.TryGetValue(CollectionItemConstants.CollectionIdFieldName, out var collectionIdObj))
+        {
+            if (Guid.TryParse(collectionIdObj.ToString(), out var collectionId))
+            {
+                CollectionId = collectionId;
+            }
+        }
+        if (record.Fields.TryGetValue(CollectionItemConstants.CreatedFieldName, out var createdObj))
+        {
+            if (DateTime.TryParse(createdObj.ToString(), out var created))
+            {
+                Created = created;
+            }
+        }
+        if (record.Fields.TryGetValue(CollectionItemConstants.UpdatedFieldName, out var updatedObj))
+        {
+            if (DateTime.TryParse(updatedObj.ToString(), out var updated))
+            {
+                Updated = updated;
+            }
+        }
         var fields = record.Fields;
         fields.Remove(CollectionItemConstants.CollectionIdFieldName);
         fields.Remove(CollectionItemConstants.CreatedFieldName);

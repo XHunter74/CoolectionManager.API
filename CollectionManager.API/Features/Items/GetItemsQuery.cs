@@ -12,6 +12,7 @@ public class GetItemsQuery : IQuery<IEnumerable<ExpandoObject>>
 {
     public Guid CollectionId { get; set; }
     public Guid UserId { get; set; }
+    public IEnumerable<string>? Fields { get; set; }
 }
 
 public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<ExpandoObject>>
@@ -44,7 +45,7 @@ public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<Exp
             throw new NotFoundException($"Collection '{query.CollectionId}' not found");
         }
         var items = (await _mongoDbContext.CollectionItems
-            .GetAllCollectionItemsAsync(query.CollectionId, cancellationToken))
+            .GetAllCollectionItemsAsync(query.CollectionId, query.Fields, cancellationToken))
             .Select(e => e.ToFlattenedExpando());
 
         return items;

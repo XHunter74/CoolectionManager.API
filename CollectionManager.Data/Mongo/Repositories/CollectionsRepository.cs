@@ -52,11 +52,27 @@ public class CollectionsRepository : IRepository<CollectionItemRecord>
         return result.DeletedCount > 0;
     }
 
-    public virtual async Task<IEnumerable<CollectionItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
+    public virtual async Task<IEnumerable<CollectionItemRecord>> GetAllCollectionItemsAsync(Guid collectionId,
+        IEnumerable<string>? fieldsToInclude, CancellationToken cancellationToken)
     {
         var filter = Builders<DynamicRecord>.Filter.Eq(CollectionItemConstants.CollectionIdFieldName, collectionId.ToString());
-        var allIntDocuments = _session == null ? await _collection.Find(filter).ToListAsync(cancellationToken)
-            : await _collection.Find(_session, filter).ToListAsync(cancellationToken);
+
+        var find = _session == null
+            ? _collection.Find(filter)
+            : _collection.Find(_session, filter);
+
+        if (fieldsToInclude != null && fieldsToInclude.Any())
+        {
+            var projDef = Builders<DynamicRecord>.Projection.Include(fieldsToInclude.First());
+            foreach (var field in fieldsToInclude.Skip(1))
+                projDef = projDef.Include(field);
+
+            find = find.Project<DynamicRecord>(projDef);
+        }
+
+        var allIntDocuments = _session == null
+            ? await find.ToListAsync(cancellationToken)
+            : await find.ToListAsync(cancellationToken);
 
         var allDocuments = allIntDocuments.Select(d => new CollectionItemRecord(d))
             .ToList();

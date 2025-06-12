@@ -30,17 +30,20 @@ public class ItemsController : ControllerBase
 
     /// <summary>
     /// Gets all items for a specific collection owned by the current user.
+    ///<paramref name="fields"> Is an optional query parameter that allows filtering the fields returned for each item.</paramref>
     /// </summary>
     [HttpGet("/api/Collections/{id:guid}/[controller]")]
     [ProducesResponseType(typeof(IEnumerable<CollectionItemRecord>), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetItemsAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetItemsAsync(Guid id, [FromQuery] string[]? fields,
+        CancellationToken cancellationToken)
     {
         var userId = User.UserId();
         var result = await _mediatr.QueryAsync(new GetItemsQuery
         {
             CollectionId = id,
             UserId = userId,
+            Fields = fields
         }, cancellationToken);
         return Ok(result);
     }

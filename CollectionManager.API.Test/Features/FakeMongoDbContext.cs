@@ -50,7 +50,7 @@ internal class FakeMongoDbContext : IMongoDbContext
             return Task.FromResult(item);
         }
 
-        public override Task<IEnumerable<CollectionItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, CancellationToken cancellationToken)
+        public override Task<IEnumerable<CollectionItemRecord>> GetAllCollectionItemsAsync(Guid collectionId, IEnumerable<string>? fieldsToInclude, CancellationToken cancellationToken)
         {
             var items = _items.Values.Where(i => i.CollectionId == collectionId).ToList();
             return Task.FromResult<IEnumerable<CollectionItemRecord>>(items);

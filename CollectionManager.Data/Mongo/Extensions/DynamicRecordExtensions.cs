@@ -10,9 +10,12 @@ public static class DynamicItemRecordExtensions
         var result = new ExpandoObject() as IDictionary<string, object>;
 
         result[nameof(record.Id)] = record.Id;
-        result[nameof(record.CollectionId)] = record.CollectionId;
-        result[nameof(record.Created)] = record.Created;
-        result[nameof(record.Updated)] = record.Updated;
+        if (record.CollectionId.HasValue)
+            result[nameof(record.CollectionId)] = record.CollectionId;
+        if (record.Created.HasValue)
+            result[nameof(record.Created)] = record.Created;
+        if (record.Updated.HasValue)
+            result[nameof(record.Updated)] = record.Updated;
 
         var decimalFormat = new System.Globalization.NumberFormatInfo
         {
