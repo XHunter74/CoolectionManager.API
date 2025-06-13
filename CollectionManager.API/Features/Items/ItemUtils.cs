@@ -47,12 +47,12 @@ public static class ItemUtils
         var item = new ItemDto
         {
             Id = itemInDb.Id,
-            CollectionId = itemInDb.CollectionId.Value,
-            DisplayName = ItemUtils.GetStringField(itemInDb.Fields, Constants.DisplayNameFieldName),
-            Picture = ItemUtils.GetGuidField(itemInDb.Fields, Constants.PictureFieldName),
-            Values = ItemUtils.GetItemValues(itemInDb.Fields, collectionFields),
-            Created = itemInDb.Created.Value,
-            Updated = itemInDb.Updated.Value
+            CollectionId = itemInDb.CollectionId != null ? itemInDb.CollectionId.Value : null,
+            DisplayName = GetStringField(itemInDb.Fields, Constants.DisplayNameFieldName),
+            Picture = GetGuidField(itemInDb.Fields, Constants.PictureFieldName),
+            Values = GetItemValues(itemInDb.Fields, collectionFields),
+            Created = itemInDb.Created != null ? itemInDb.Created.Value : null,
+            Updated = itemInDb.Updated != null ? itemInDb.Updated.Value : null
         };
         return item;
     }
