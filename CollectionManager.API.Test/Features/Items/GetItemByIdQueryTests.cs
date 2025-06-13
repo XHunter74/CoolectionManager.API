@@ -14,15 +14,15 @@ public class GetItemByIdQueryTests : BaseConnectorTest<GetItemByIdQueryHandler>
         _handler = new GetItemByIdQueryHandler(CollectionsDbContext, MongoDbContextMock, LoggerMock.Object);
     }
 
-    [Fact(DisplayName = "HandleAsync throws NotFoundException if item does not exist")]
-    public async Task HandleAsync_ThrowsNotFound_IfItemMissing()
+    [Fact(DisplayName = "HandleAsync throws NotFoundException when item does not exist")]
+    public async Task HandleAsync_ThrowsNotFoundException_WhenItemDoesNotExist()
     {
         var query = new GetItemByIdQuery { ItemId = Guid.NewGuid(), UserId = Guid.NewGuid() };
         await Assert.ThrowsAsync<NotFoundException>(() => _handler.HandleAsync(query, CancellationToken.None));
     }
 
-    [Fact(DisplayName = "HandleAsync throws NotFoundException if collection does not exist or not owned by user")]
-    public async Task HandleAsync_ThrowsNotFound_IfCollectionMissingOrNotOwned()
+    [Fact(DisplayName = "HandleAsync throws NotFoundException when collection does not exist or not owned by user")]
+    public async Task HandleAsync_ThrowsNotFoundException_WhenCollectionDoesNotExistOrNotOwnedByUser()
     {
         var itemId = Guid.NewGuid();
         var collectionId = Guid.NewGuid();
@@ -34,8 +34,8 @@ public class GetItemByIdQueryTests : BaseConnectorTest<GetItemByIdQueryHandler>
         await Assert.ThrowsAsync<NotFoundException>(() => _handler.HandleAsync(query, CancellationToken.None));
     }
 
-    [Fact(DisplayName = "HandleAsync returns flattened expando when item and collection exist and user is owner")]
-    public async Task HandleAsync_ReturnsExpando_WhenSuccess()
+    [Fact(DisplayName = "HandleAsync returns ItemDto when item and collection exist and user is owner")]
+    public async Task HandleAsync_ReturnsItemDto_WhenItemAndCollectionExistAndUserIsOwner()
     {
         var itemId = Guid.NewGuid();
         var collectionId = Guid.NewGuid();
@@ -56,8 +56,7 @@ public class GetItemByIdQueryTests : BaseConnectorTest<GetItemByIdQueryHandler>
         var query = new GetItemByIdQuery { ItemId = itemId, UserId = userId };
         var result = await _handler.HandleAsync(query, CancellationToken.None);
         Assert.NotNull(result);
-        var dict = (IDictionary<string, object>)result;
-        Assert.Equal(itemId, dict["Id"]);
-        Assert.Equal(collectionId, dict["CollectionId"]);
+        Assert.Equal(itemId, result.Id);
+        Assert.Equal(collectionId, result.CollectionId);
     }
 }

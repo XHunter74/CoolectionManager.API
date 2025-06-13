@@ -14,8 +14,8 @@ public class GetItemsQueryTests : BaseConnectorTest<GetItemsQueryHandler>
         _handler = new GetItemsQueryHandler(CollectionsDbContext, MongoDbContextMock, LoggerMock.Object);
     }
 
-    [Fact(DisplayName = "HandleAsync throws NotFoundException if collection does not exist or not owned by user")]
-    public async Task HandleAsync_ThrowsNotFound_IfCollectionMissingOrNotOwned()
+    [Fact(DisplayName = "HandleAsync throws NotFoundException when collection does not exist or not owned by user")]
+    public async Task HandleAsync_ThrowsNotFoundException_WhenCollectionDoesNotExistOrNotOwnedByUser()
     {
         var collectionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -25,8 +25,8 @@ public class GetItemsQueryTests : BaseConnectorTest<GetItemsQueryHandler>
         await Assert.ThrowsAsync<NotFoundException>(() => _handler.HandleAsync(query, CancellationToken.None));
     }
 
-    [Fact(DisplayName = "HandleAsync returns empty list if collection exists but no items")]
-    public async Task HandleAsync_ReturnsEmptyList_IfNoItems()
+    [Fact(DisplayName = "HandleAsync returns empty list when collection exists but no items")]
+    public async Task HandleAsync_ReturnsEmptyList_WhenCollectionExistsButNoItems()
     {
         var collectionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -44,14 +44,14 @@ public class GetItemsQueryTests : BaseConnectorTest<GetItemsQueryHandler>
 
         var query = new GetItemsQuery { CollectionId = collectionId, UserId = userId };
 
-        var result = await _handler.HandleAsync(query, CancellationToken.None);
+        var result = (await _handler.HandleAsync(query, CancellationToken.None)).ToList();
 
         Assert.NotNull(result);
         Assert.Empty(result);
     }
 
-    [Fact(DisplayName = "HandleAsync returns flattened expando list when items exist and user is owner")]
-    public async Task HandleAsync_ReturnsExpandoList_WhenSuccess()
+    [Fact(DisplayName = "HandleAsync returns ItemDto list when items exist and user is owner")]
+    public async Task HandleAsync_ReturnsItemDtoList_WhenItemsExistAndUserIsOwner()
     {
         var collectionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -77,11 +77,7 @@ public class GetItemsQueryTests : BaseConnectorTest<GetItemsQueryHandler>
         var result = (await _handler.HandleAsync(query, CancellationToken.None)).ToList();
         
         Assert.Equal(2, result.Count);
-        var dict1 = (IDictionary<string, object>)result[0];
-        var dict2 = (IDictionary<string, object>)result[1];
-        Assert.Contains(dict1["Id"], new object[] { item1.Id, item2.Id });
-        Assert.Contains(dict2["Id"], new object[] { item1.Id, item2.Id });
-        Assert.Equal(collectionId, dict1["CollectionId"]);
-        Assert.Equal(collectionId, dict2["CollectionId"]);
+        Assert.Contains(result, r => r.Id == item1.Id && r.CollectionId == collectionId);
+        Assert.Contains(result, r => r.Id == item2.Id && r.CollectionId == collectionId);
     }
 }
