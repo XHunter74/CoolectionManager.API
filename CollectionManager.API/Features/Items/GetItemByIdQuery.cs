@@ -49,16 +49,7 @@ public class GetItemByIdQueryHandler : IQueryHandler<GetItemByIdQuery, ItemDto>
             throw new NotFoundException($"Collection with item ID '{query.ItemId}' not found");
         }
 
-        var item = new ItemDto
-        {
-            Id = itemInDb.Id,
-            CollectionId = itemInDb.CollectionId.Value,
-            DisplayName = ItemUtils.GetStringField(itemInDb.Fields, Constants.DisplayNameFieldName),
-            Picture = ItemUtils.GetGuidField(itemInDb.Fields, Constants.PictureFieldName),
-            Values = ItemUtils.GetItemValues(itemInDb.Fields, collection.Fields),
-            Created = itemInDb.Created.Value,
-            Updated = itemInDb.Updated.Value
-        };
+        var item = ItemUtils.ConvertMongoItemToItemDto(collection.Fields, itemInDb);
 
         return item;
     }

@@ -45,16 +45,7 @@ public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<Ite
         }
         var items = (await _mongoDbContext.CollectionItems
             .GetAllCollectionItemsAsync(query.CollectionId, query.Fields, cancellationToken))
-            .Select(e => new ItemDto
-            {
-                Id = e.Id,
-                CollectionId = e.CollectionId.Value,
-                DisplayName = ItemUtils.GetStringField(e.Fields, Constants.DisplayNameFieldName),
-                Picture = ItemUtils.GetGuidField(e.Fields, Constants.PictureFieldName),
-                Values = ItemUtils.GetItemValues(e.Fields, collection.Fields),
-                Created = e.Created.Value,
-                Updated = e.Updated.Value
-            });
+            .Select(e => ItemUtils.ConvertMongoItemToItemDto(collection.Fields, e));
 
         return items;
     }

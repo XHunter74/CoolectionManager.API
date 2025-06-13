@@ -1,5 +1,6 @@
 ﻿using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
+using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.API.Features.Items;
 
@@ -38,5 +39,21 @@ public static class ItemUtils
             return nameObj.ToString();
         }
         return string.Empty;
+    }
+
+    internal static ItemDto ConvertMongoItemToItemDto(ICollection<CollectionField> collectionFields,
+        CollectionItemRecord itemInDb)
+    {
+        var item = new ItemDto
+        {
+            Id = itemInDb.Id,
+            CollectionId = itemInDb.CollectionId.Value,
+            DisplayName = ItemUtils.GetStringField(itemInDb.Fields, Constants.DisplayNameFieldName),
+            Picture = ItemUtils.GetGuidField(itemInDb.Fields, Constants.PictureFieldName),
+            Values = ItemUtils.GetItemValues(itemInDb.Fields, collectionFields),
+            Created = itemInDb.Created.Value,
+            Updated = itemInDb.Updated.Value
+        };
+        return item;
     }
 }

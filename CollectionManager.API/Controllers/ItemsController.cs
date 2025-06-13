@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using xhunter74.CollectionManager.API.Extensions;
 using xhunter74.CollectionManager.API.Features.Items;
 using xhunter74.CollectionManager.API.Models;
-using xhunter74.CollectionManager.Data.Mongo.Extensions;
 using xhunter74.CollectionManager.Data.Mongo.Records;
 
 namespace xhunter74.CollectionManager.API.Controllers;
@@ -72,7 +71,7 @@ public class ItemsController : ControllerBase
     [ProducesResponseType(typeof(CollectionItemRecord), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> CreateItemAsync(Guid collectionId, [FromBody] CreateItemDto[] model, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateItemAsync(Guid collectionId, [FromBody] CreateItemDto model, CancellationToken cancellationToken)
     {
         var userId = User.UserId();
 
@@ -88,8 +87,26 @@ public class ItemsController : ControllerBase
             return BadRequest("Failed to create item. Please check the provided data.");
         }
 
-        var newItemId = newItem.GetFieldValue(Constants.IdFieldName);
+        return CreatedAtRoute(nameof(GetItemByIdAsync), new { id = newItem.Id }, newItem);
+    }
 
-        return CreatedAtRoute(nameof(GetItemByIdAsync), new { id = newItemId }, newItem);
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateItemAsync(Guid id, [FromBody] CreateItemDto model, CancellationToken cancellationToken)
+    {
+        var userId = User.UserId();
+
+        var updatedItem = await _mediatr.SendAsync(new UpdateItemCommand
+        {
+            ItemId = id,
+            UserId = userId,
+            Model = model
+        }, cancellationToken);
+
+        if (updatedItem == null)
+        {
+            return BadRequest("Failed to create item. Please check the provided data.");
+        }
+
+        return Ok(updatedItem);
     }
 }

@@ -6,51 +6,61 @@ using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Data.Mongo;
 using xhunter74.CollectionManager.Data.Mongo.Records;
 using xhunter74.CollectionManager.Shared.Exceptions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace xhunter74.CollectionManager.API.Features.Items;
 
-public class CreateItemCommand : ICommand<ItemDto>
+public class UpdateItemCommand : ICommand<ItemDto>
 {
-    public Guid CollectionId { get; set; }
     public Guid UserId { get; set; }
+    public Guid ItemId { get; set; }
     public CreateItemDto Model { get; set; }
 }
 
-public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, ItemDto>
+public class UpdateItemCommandHandler : ICommandHandler<UpdateItemCommand, ItemDto>
 {
     private readonly CollectionsDbContext _dbContext;
     private readonly IMongoDbContext _mongoDbContext;
-    private readonly ILogger<CreateItemCommandHandler> _logger;
+    private readonly ILogger<UpdateItemCommandHandler> _logger;
 
-    public CreateItemCommandHandler(
+    public UpdateItemCommandHandler(
         CollectionsDbContext dbContext,
         IMongoDbContext mongoDbContext,
-        ILogger<CreateItemCommandHandler> logger
-        )
+        ILogger<UpdateItemCommandHandler> logger)
     {
         _dbContext = dbContext;
         _mongoDbContext = mongoDbContext;
         _logger = logger;
     }
 
-    public async Task<ItemDto> HandleAsync(CreateItemCommand command, CancellationToken cancellationToken)
+    public async Task<ItemDto> HandleAsync(UpdateItemCommand command, CancellationToken cancellationToken)
     {
+        var itemInDb = await _mongoDbContext.CollectionItems
+            .GetByIdAsync(command.ItemId, cancellationToken);
+
+        if (itemInDb == null)
+        {
+            _logger.LogWarning("Item with ID {Id} not found for user {UserId}", command.ItemId, command.UserId);
+            throw new NotFoundException($"Item '{command.ItemId}' not found");
+        }
+
         var collection = await _dbContext.Collections
-            .Include(c => c.Fields)
-            .AsNoTracking()
-            .AsSplitQuery()
-            .FirstOrDefaultAsync(c => c.Id == command.CollectionId && c.OwnerId == command.UserId, cancellationToken);
+             .Include(c => c.Fields)
+             .AsNoTracking()
+             .AsSplitQuery()
+             .FirstOrDefaultAsync(c => c.Id == itemInDb.CollectionId && c.OwnerId == command.UserId, cancellationToken);
 
         if (collection == null)
         {
-            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", command.CollectionId, command.UserId);
-            throw new NotFoundException($"Collection '{command.CollectionId}' not found");
+            _logger.LogWarning("Collection with ID {Id} not found for user {UserId}", itemInDb.CollectionId, command.UserId);
+            throw new NotFoundException($"Collection '{itemInDb.CollectionId}' not found");
         }
 
         var itemDoc = new CollectionItemRecord
         {
-            CollectionId = command.CollectionId,
-            Created = DateTime.UtcNow,
+            Id = itemInDb.Id,
+            CollectionId = itemInDb.CollectionId,
+            Created = itemInDb.Created,
             Updated = DateTime.UtcNow
         };
 
@@ -68,7 +78,8 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, ItemD
 
             if (item == null && field.IsRequired)
             {
-                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}", field.DisplayName, command.CollectionId, command.UserId);
+                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}",
+                    field.DisplayName, itemInDb.CollectionId, command.UserId);
                 throw new BadRequestException($"Required field '{field.DisplayName}' is missing");
             }
             if (item != null)
@@ -77,9 +88,12 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, ItemD
             }
         }
 
-        var newItem = await _mongoDbContext.CollectionItems.AddAsync(itemDoc, cancellationToken);
+        _ = await _mongoDbContext.CollectionItems.UpdateAsync(itemInDb.Id, itemDoc, cancellationToken);
 
-        var resultItem = ItemUtils.ConvertMongoItemToItemDto(collection.Fields, newItem);
+        var updatedItem = await _mongoDbContext.CollectionItems
+            .GetByIdAsync(command.ItemId, cancellationToken);
+
+        var resultItem = ItemUtils.ConvertMongoItemToItemDto(collection.Fields, updatedItem);
 
         return resultItem;
     }
