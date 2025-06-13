@@ -10,5 +10,5 @@ public class CreateItemDto
 public class CreateItemValue
 {
     public Guid FieldId { get; set; }
-    public object Value { get; set; }
+    public object? Value { get; set; }
 }
