@@ -48,8 +48,7 @@ public class ChangeCollectionFieldOrderCommandHandler : ICommandHandler<ChangeCo
         return new CollectionFieldDto
         {
             Id = field.Id,
-            Name = field.Name,
-            Description = field.Description,
+            DisplayName = field.DisplayName,
             Type = field.Type,
             IsRequired = field.IsRequired,
             Order = field.Order

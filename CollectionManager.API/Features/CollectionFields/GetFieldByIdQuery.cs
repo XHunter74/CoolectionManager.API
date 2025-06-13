@@ -38,8 +38,7 @@ public class GetFieldByIdQueryHandler : IQueryHandler<GetFieldByIdQuery, Collect
         return new CollectionFieldDto
         {
             Id = field.Id,
-            Name = field.Name,
-            Description = field.Description,
+            DisplayName = field.DisplayName,
             Type = field.Type,
             IsRequired = field.IsRequired,
             Order = field.Order,

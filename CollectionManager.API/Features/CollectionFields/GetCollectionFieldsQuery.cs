@@ -40,8 +40,7 @@ public class GetCollectionFieldsQueryHandler : IQueryHandler<GetCollectionFields
         var fields = collection.Fields.Select(f => new CollectionFieldDto
         {
             Id = f.Id,
-            Name = f.Name,
-            Description = f.Description,
+            DisplayName = f.DisplayName,
             IsSystem = f.IsSystem,
             Type = f.Type,
             IsRequired = f.IsRequired,

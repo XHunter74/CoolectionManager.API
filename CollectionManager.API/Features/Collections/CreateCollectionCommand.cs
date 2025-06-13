@@ -45,7 +45,7 @@ public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCo
             var newField = new CollectionField
             {
                 CollectionId = newCollection.Id,
-                Name = field.Name,
+                DisplayName = field.Name,
                 Type = field.Type,
                 IsRequired = field.IsRequired,
                 IsSystem = true,

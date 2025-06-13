@@ -49,14 +49,14 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, Expan
 
         foreach (var field in collection.Fields)
         {
-            var item = command.Model.FirstOrDefault(i => i.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase));
+            var item = command.Model.FirstOrDefault(i => i.Name.Equals(field.DisplayName, StringComparison.InvariantCultureIgnoreCase));
 
             if (item == null && field.IsRequired)
             {
-                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}", field.Name, command.CollectionId, command.UserId);
-                throw new BadRequestException($"Required field '{field.Name}' is missing");
+                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}", field.DisplayName, command.CollectionId, command.UserId);
+                throw new BadRequestException($"Required field '{field.DisplayName}' is missing");
             }
-            itemDoc.Fields.Add(field.Name, item.Value != null ? (BsonValue)item.Value : BsonNull.Value);
+            itemDoc.Fields.Add(field.DisplayName, item.Value != null ? (BsonValue)item.Value : BsonNull.Value);
         }
 
         var newItem = await _mongoDbContext.CollectionItems.AddAsync(itemDoc, cancellationToken);

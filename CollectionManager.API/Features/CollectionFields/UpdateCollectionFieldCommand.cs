@@ -37,8 +37,7 @@ public class UpdateCollectionFieldCommandHandler : ICommandHandler<UpdateCollect
             throw new NotFoundException($"Collection field with ID {command.Id} not found");
         }
 
-        field.Name = command.Model.Name;
-        field.Description = command.Model.Description;
+        field.DisplayName = command.Model.DisplayName;
         field.Type = command.Model.Type;
         field.IsRequired = command.Model.IsRequired;
         field.Order = command.Model.Order;
@@ -48,8 +47,7 @@ public class UpdateCollectionFieldCommandHandler : ICommandHandler<UpdateCollect
         return new CollectionFieldDto
         {
             Id = field.Id,
-            Name = field.Name,
-            Description = field.Description,
+            DisplayName = field.DisplayName,
             IsSystem = field.IsSystem,
             Type = field.Type,
             IsRequired = field.IsRequired,
