@@ -1,11 +1,8 @@
 ﻿using CQRSMediatr.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Dynamic;
 using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Data.Mongo;
-using xhunter74.CollectionManager.Data.Mongo.Extensions;
-using xhunter74.CollectionManager.Data.Mongo.Records;
 using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Features.Items;
