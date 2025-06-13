@@ -1,21 +1,20 @@
 ﻿using CQRSMediatr.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Dynamic;
+using xhunter74.CollectionManager.API.Models;
 using xhunter74.CollectionManager.Data.Entity;
 using xhunter74.CollectionManager.Data.Mongo;
-using xhunter74.CollectionManager.Data.Mongo.Extensions;
 using xhunter74.CollectionManager.Shared.Exceptions;
 
 namespace xhunter74.CollectionManager.API.Features.Items;
 
-public class GetItemsQuery : IQuery<IEnumerable<ExpandoObject>>
+public class GetItemsQuery : IQuery<IEnumerable<ItemDto>>
 {
     public Guid CollectionId { get; set; }
     public Guid UserId { get; set; }
     public IEnumerable<string>? Fields { get; set; }
 }
 
-public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<ExpandoObject>>
+public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<ItemDto>>
 {
     private readonly CollectionsDbContext _dbContext;
     private readonly IMongoDbContext _mongoDbContext;
@@ -31,7 +30,7 @@ public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<Exp
         _logger = logger;
     }
 
-    public async Task<IEnumerable<ExpandoObject>> HandleAsync(GetItemsQuery query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ItemDto>> HandleAsync(GetItemsQuery query, CancellationToken cancellationToken)
     {
         var collection = await _dbContext.Collections
             .Include(c => c.Fields)
@@ -46,7 +45,16 @@ public class GetItemsQueryHandler : IQueryHandler<GetItemsQuery, IEnumerable<Exp
         }
         var items = (await _mongoDbContext.CollectionItems
             .GetAllCollectionItemsAsync(query.CollectionId, query.Fields, cancellationToken))
-            .Select(e => e.ToFlattenedExpando());
+            .Select(e => new ItemDto
+            {
+                Id = e.Id,
+                CollectionId = e.CollectionId.Value,
+                DisplayName = ItemUtils.GetStringField(e.Fields, Constants.DisplayNameFieldName),
+                Picture = ItemUtils.GetGuidField(e.Fields, Constants.PictureFieldName),
+                Values = ItemUtils.GetItemValues(e.Fields, collection.Fields),
+                Created = e.Created.Value,
+                Updated = e.Updated.Value
+            });
 
         return items;
     }

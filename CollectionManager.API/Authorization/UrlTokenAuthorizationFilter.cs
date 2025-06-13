@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using OpenIddict.Validation.AspNetCore;
-using System.Security.Claims;
-using Microsoft.Extensions.DependencyInjection;
-using OpenIddict.Abstractions;
 using OpenIddict.Validation;
 
 namespace xhunter74.CollectionManager.API.Authorization;

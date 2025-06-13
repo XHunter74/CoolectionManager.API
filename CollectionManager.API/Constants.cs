@@ -3,6 +3,8 @@
 public static class Constants
 {
     public const string AvatarFormFieldName = "avatar";
+    public const string DisplayNameFieldName = "DisplayName";
+    public const string PictureFieldName = "Picture";
     public const string FileFormFieldName = "file";
     public const string AvatarFileName = "avatar.png";
     public const string AvatarContentType = "image/png";
