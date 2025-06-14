@@ -34,7 +34,7 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<CollectionField>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Type).IsRequired();
             entity.HasOne(e => e.Collection)
                 .WithMany(c => c.Fields)

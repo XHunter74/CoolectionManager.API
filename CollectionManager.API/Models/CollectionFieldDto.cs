@@ -17,7 +17,6 @@ public record CollectionFieldDto
 public record CreateCollectionFieldDto(
     [Required] string DisplayName,
     [Required] FieldTypes Type,
-    bool IsRequired,
     int Order
 );
 

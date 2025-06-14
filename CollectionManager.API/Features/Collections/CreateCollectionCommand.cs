@@ -13,9 +13,8 @@ public class CreateCollectionCommand : ICommand<CollectionDto>
 public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCommand, CollectionDto>
 {
     private readonly dynamic[] SystemFields = {
-        new { Name= "Name", @Type=FieldTypes.String, IsRequired=true},
-        new { Name= "Description", @Type=FieldTypes.String, IsRequired=false},
-        new { Name= "Picture", @Type=FieldTypes.Image, IsRequired=true}
+        new { Name= "DisplaName", @Type=FieldTypes.String, IsRequired=true},
+        new { Name= "Picture", @Type=FieldTypes.Image, IsRequired=false}
     };
     private readonly CollectionsDbContext _dbContext;
     private readonly ILogger<CreateCollectionCommandHandler> _logger;
@@ -45,7 +44,7 @@ public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCo
             var newField = new CollectionField
             {
                 CollectionId = newCollection.Id,
-                DisplayName = field.Name,
+                Name = field.Name,
                 Type = field.Type,
                 IsRequired = field.IsRequired,
                 IsSystem = true,

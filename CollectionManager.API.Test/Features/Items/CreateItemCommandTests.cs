@@ -37,7 +37,7 @@ public class CreateItemCommandTests : BaseConnectorTest<CreateItemCommandHandler
             Name = "Test Collection",
             Description = "Test Collection",
             OwnerId = Guid.NewGuid(),
-            Fields = new List<CollectionField> { new CollectionField { DisplayName = "Field1", IsRequired = true } }
+            Fields = new List<CollectionField> { new CollectionField { Name = "Field1", IsRequired = true } }
         };
 
         CollectionsDbContext.Collections.Add(collection);
@@ -62,7 +62,7 @@ public class CreateItemCommandTests : BaseConnectorTest<CreateItemCommandHandler
             OwnerId = Guid.NewGuid(),
             Name = "Test Collection",
             Description = "Test Collection",
-            Fields = new List<CollectionField> { new CollectionField { DisplayName = "Field1", IsRequired = false, Id = Guid.NewGuid() } }
+            Fields = new List<CollectionField> { new CollectionField { Name = "Field1", IsRequired = false, Id = Guid.NewGuid() } }
         };
 
         CollectionsDbContext.Collections.Add(collection);

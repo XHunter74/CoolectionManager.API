@@ -62,14 +62,14 @@ public class CreateItemCommandHandler : ICommandHandler<CreateItemCommand, ItemD
 
         string[] excludedFields = { Constants.DisplayNameFieldName, Constants.PictureFieldName };
 
-        foreach (var field in collection.Fields.Where(e => !excludedFields.Contains(e.DisplayName)))
+        foreach (var field in collection.Fields.Where(e => !excludedFields.Contains(e.Name)))
         {
             var item = command.Model.Values.FirstOrDefault(i => i.FieldId.Equals(field.Id));
 
             if (item == null && field.IsRequired)
             {
-                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}", field.DisplayName, command.CollectionId, command.UserId);
-                throw new BadRequestException($"Required field '{field.DisplayName}' is missing");
+                _logger.LogWarning("Required field {FieldName} is missing in collection {CollectionId} for user {UserId}", field.Name, command.CollectionId, command.UserId);
+                throw new BadRequestException($"Required field '{field.Name}' is missing");
             }
             if (item != null)
             {

@@ -41,9 +41,8 @@ public class CreateCollectionFieldCommandHandler : ICommandHandler<CreateCollect
         var field = new CollectionField
         {
             Id = Guid.NewGuid(),
-            DisplayName = command.Model.DisplayName,
+            Name = command.Model.DisplayName,
             Type = command.Model.Type,
-            IsRequired = command.Model.IsRequired,
             Order = command.Model.Order,
             CollectionId = command.CollectionId
         };
@@ -54,7 +53,7 @@ public class CreateCollectionFieldCommandHandler : ICommandHandler<CreateCollect
         return new CollectionFieldDto
         {
             Id = field.Id,
-            DisplayName = field.DisplayName,
+            DisplayName = field.Name,
             Type = field.Type,
             IsRequired = field.IsRequired,
             Order = field.Order,

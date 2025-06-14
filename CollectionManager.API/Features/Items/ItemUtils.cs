@@ -15,7 +15,7 @@ public static class ItemUtils
                 yield return new ItemValue
                 {
                     FieldId = field.Id,
-                    FieldName = field.DisplayName,
+                    FieldName = field.Name,
                     Value = valueObj
                 };
             }
