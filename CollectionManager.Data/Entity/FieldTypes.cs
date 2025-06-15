@@ -13,5 +13,6 @@ public enum FieldTypes
     Time = 8,
     YesNo = 9,
     Select = 10,
-    Image = 11
+    Image = 11,
+    ImageList = 12,
 }
