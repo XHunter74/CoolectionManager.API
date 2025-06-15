@@ -36,7 +36,7 @@ public static class ItemUtils
     {
         if (fields.TryGetValue(fieldName, out var nameObj))
         {
-            return nameObj.ToString();
+            return nameObj?.ToString();
         }
         return string.Empty;
     }
