@@ -41,7 +41,6 @@ public class CollectionsDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasForeignKey(e => e.CollectionId)
                 .HasPrincipalKey(e => e.Id)
                 .OnDelete(DeleteBehavior.Cascade);
-            entity.HasIndex(e => new { e.CollectionId, e.Order }).IsUnique();
         });
 
         builder.Entity<File>(entity =>
